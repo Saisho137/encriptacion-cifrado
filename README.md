@@ -847,11 +847,15 @@ Microcontroladores    | 1-10 MB/s   | 5-20 MB/s
 
 #### **RSA vs Eval: La Batalla por la Velocidad**
 
+<!-- TODO: Hacer esta comparación. -->
+
 ---
 
 ## 8. Patrones de Seguridad Web Aplicados
 
 Ahora unamos todo el conocimiento teórico con la implementación práctica. ¿Cómo se manifiestan estos conceptos en el día a día de un desarrollador Full Stack?
+
+<!-- TODO: Refinar el contenido de los Pattern. -->
 
 ### Pattern 1: Asegurar Datos en Tránsito (HTTPS/TLS)
 
@@ -1407,3 +1411,13 @@ console.log('Integrity Check:', verification.overallValid ? 'PASSED' : 'FAILED')
 ```
 
 Estos patrones forman la base de un sistema de seguridad robusto en aplicaciones web modernas, combinando la teoría criptográfica con implementaciones prácticas y seguras.
+
+## 9. Buenas Prácticas y Resumen
+
+- **Nunca implementes tu propia criptografía**. Usa librerías estándar, auditadas y bien mantenidas (`libsodium`, `OpenSSL`, y las APIs nativas de tu lenguaje como `crypto` en Node.js).
+- **Mantén las claves seguras**. Las claves son el eslabón más débil. Usa gestores de secretos (Vault, KMS) y nunca las hardcodees en tu código.
+- **Usa los algoritmos correctos para el trabajo correcto**:
+  - **Contraseñas**: `Argon2id`.
+  - **Datos en tránsito/reposo**: `AES-256-GCM`.
+  - **Firmas digitales**: `Ed25519` (o `RSA-3072` si es necesario).
+- **Mantente actualizado**. El campo de la criptografía evoluciona. Algoritmos que son seguros hoy pueden ser débiles mañana. Sigue las recomendaciones de organizaciones como NIST y OWASP.
