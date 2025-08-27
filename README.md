@@ -6,14 +6,14 @@ Esta es una guía de estudio completa sobre los conceptos de seguridad web, con 
 
 ## 📑 Tabla de Contenidos
 
-1.  [Conceptos Fundamentales](#1-fundamentos-criptografía-encriptación-o-cifrado)
-2.  [Historia y Tipos de Ataques Criptográficos](#2)
-3.  [Cifrado Simétrico](https://www.google.com/search?q=%233-cifrado-sim%C3%A9trico-la-llave-%C3%BAnica)
-4.  [Cifrado Asimétrico](https://www.google.com/search?q=%234-cifrado-asim%C3%A9trico-el-par-de-llaves)
-5.  [Funciones Hash](https://www.google.com/search?q=%235-funciones-hash-la-huella-digital)
-6.  [Análisis Comparativo de Algoritmos Modernos](https://www.google.com/search?q=%236-an%C3%A1lisis-comparativo-de-algoritmos-modernos)
-7.  [Patrones de Seguridad en Aplicaciones Web](https://www.google.com/search?q=%237-patrones-de-seguridad-en-aplicaciones-web)
-8.  [Buenas Prácticas y Resumen](https://www.google.com/search?q=%238-buenas-pr%C3%A1cticas-y-resumen)
+1. [Conceptos Fundamentales](#1-fundamentos-criptografía-encriptación-o-cifrado)
+2. [Historia y Tipos de Ataques Criptográficos](#2-historia-y-tipos-de-ataques-criptográficos)
+3. [Cifrado Simétrico](https://www.google.com/search?q=%233-cifrado-sim%C3%A9trico-la-llave-%C3%BAnica)
+4. [Cifrado Asimétrico](#4-cifrado-asimétrico--)
+5. [Funciones Hash](#5-funciones-hash-la-huella-digital-de-los-datos)
+6. [Análisis Comparativo de Algoritmos Modernos](https://www.google.com/search?q=%236-an%C3%A1lisis-comparativo-de-algoritmos-modernos)
+7. [Patrones de Seguridad en Aplicaciones Web](https://www.google.com/search?q=%237-patrones-de-seguridad-en-aplicaciones-web)
+8. [Buenas Prácticas y Resumen](https://www.google.com/search?q=%238-buenas-pr%C3%A1cticas-y-resumen)
 
 ---
 
@@ -30,41 +30,48 @@ Para empezar, aclaremos los términos. Aunque a menudo se usan indistintamente, 
 - **Descifrado o Desencriptación**: Es el proceso inverso: convertir el texto cifrado de nuevo a texto plano, usando la clave correcta.
 
 > **No hay diferencia práctica** entre "encriptación" y "cifrado" en el contexto de seguridad informática. Ambos términos se usan intercambiablemente.
-
 > **Analogía 🧠:** Piensa en la **Criptografía** como la *ingeniería de cerraduras y cajas fuertes*. La **Encriptación** sería el *acto de girar la llave para cerrar la caja fuerte*.
 
 ### Elementos Básicos del Proceso Criptográfico
 
 #### 1. **Texto Plano (Plaintext)**
+
 - Información original legible
 - Ejemplo: "Información confidencial"
 
 #### 2. **Texto Cifrado (Ciphertext)**  
+
 - Información transformada e ilegible
 - Ejemplo: `496e666f726d6163696f6e20636f6e666964656e6369616c` (hexadecimal)
 
 #### 3. **Algoritmo de Cifrado**
+
 - Función matemática que realiza la transformación
 - Ejemplos: AES, RSA, ChaCha20
 
 #### 4. **Clave (Key)**
+
 - Parámetro secreto usado por el algoritmo
 - Su longitud determina la fortaleza del cifrado
 
 #### 5. **Descifrado (Decryption)**
+
 - Proceso inverso que convierte texto cifrado a texto plano
 
 ### Principios de Seguridad (CIA Triad)
 
 #### **Confidencialidad (Confidentiality)**
+
 - Solo personas autorizadas pueden acceder a la información
 - Implementado principalmente a través del cifrado
 
 #### **Integridad (Integrity)**
+
 - La información no ha sido alterada
 - Implementado con funciones hash y firmas digitales
 
 #### **Disponibilidad (Availability)**
+
 - La información está accesible cuando se necesita
 - Implementado con redundancia y sistemas distribuidos
 
@@ -75,27 +82,44 @@ Para empezar, aclaremos los términos. Aunque a menudo se usan indistintamente, 
 ### Evolución de la Criptografía
 
 #### **Cifrados Clásicos**
+
 - **César**: Desplazamiento de letras (ROT13)
 - **Vigenère**: Clave repetitiva
 - **Enigma**: Máquina de cifrado mecánica
 
 #### **Era Moderna**
+
 - **DES (1977)**: Primer estándar de cifrado
 - **AES (2001)**: Estándar actual
 - **Criptografía cuántica**: Futuro de la seguridad
 
+#### **El Problema Cuántico**
+
+Las computadoras cuánticas representan una amenaza existencial para la criptografía actual:
+
+- **Algoritmo de Shor**: Puede factorizar números grandes eficientemente, rompiendo RSA y ECC
+- **Algoritmo de Grover**: Reduce la seguridad de algoritmos simétricos a la mitad
+
+**Cronología estimada**:
+
+- **2030-2035**: Computadoras cuánticas podrían romper RSA-2048
+- **2040-2050**: RSA-4096 y curvas elípticas en riesgo
+
 ### Tipos de Ataques Criptográficos
 
 #### **1. Ataques de Fuerza Bruta**
+
 - **Concepto**: Probar todas las combinaciones posibles de claves
 - **Complejidad**: O(2^n) donde n es la longitud de la clave en bits
 - **Mitigación**: Claves largas (256+ bits), algoritmos lentos para contraseñas
 
 #### **2. Ataques de Diccionario**
+
 - **Concepto**: Usar claves comunes, predecibles o derivadas de palabras
 - **Mitigación**: Claves aleatorias, salt en contraseñas, entropía alta
 
 #### **3. Ataques de Análisis Criptográfico**
+
 - **Análisis de frecuencia**: Buscar patrones en el texto cifrado
 - **Criptoanálisis diferencial**: Comparar diferencias en entrada/salida
 - **Ataques de canal lateral**: Información de tiempo, energía, emanaciones electromagnéticas
@@ -107,7 +131,8 @@ Para empezar, aclaremos los términos. Aunque a menudo se usan indistintamente, 
 El cifrado simétrico es el método más antiguo e intuitivo. En el cifrado simétrico, **se utiliza la misma clave tanto para encriptar como para desencriptar** la información.
 
 ### ¿Cómo funciona?
-```
+
+```plaintext
 Texto Plano + Clave → [Algoritmo] → Texto Cifrado
 Texto Cifrado + Clave → [Algoritmo] → Texto Plano
 ```
@@ -120,13 +145,15 @@ Texto Cifrado + Clave → [Algoritmo] → Texto Plano
 ### Características Fundamentales
 
 #### **✅ Ventajas**
+
 - **Velocidad**: Extremadamente rápido y eficiente (1-15 GB/s en hardware moderno)
 - **Eficiencia**: Bajo uso de CPU y memoria
 - **Simplicidad**: Implementación más directa
 - **Ideal para grandes volúmenes**: Streams de video, bases de datos completas, archivos grandes
 
 #### **❌ Desventajas**
-- **Distribución de la Clave**: El gran problema es: ¿cómo compartes la clave secreta de forma segura con el receptor? 
+
+- **Distribución de la Clave**: El gran problema es: ¿cómo compartes la clave secreta de forma segura con el receptor?
 - **Escalabilidad**: n usuarios requieren n(n-1)/2 claves únicas
 - **No repudio**: No se puede probar quién envió el mensaje
 
@@ -135,9 +162,10 @@ Texto Cifrado + Clave → [Algoritmo] → Texto Plano
 AES es el estándar actual para el cifrado simétrico. Fue adoptado por el gobierno de EE. UU. en 2001 y hoy se usa globalmente.
 
 #### **Características Técnicas de AES**
+
 - **Longitud de clave**: 128, 192, o 256 bits
 - **Tamaño de bloque**: 128 bits (16 bytes)
-- **Rondas de cifrado**: 
+- **Rondas de cifrado**:
   - AES-128: 10 rondas
   - AES-192: 12 rondas  
   - AES-256: 14 rondas
@@ -221,27 +249,35 @@ function decrypt(encryptedData, password) {
 ### Modos de Operación Importantes
 
 #### **1. ECB (Electronic Codebook) - ❌ NO USAR**
-```
+
+```plaintext
 Bloque1 → AES → CifradoBloque1
 Bloque2 → AES → CifradoBloque2
 ```
+
 **Problema**: Patrones idénticos en el texto plano producen patrones idénticos en el texto cifrado.
 
 #### **2. CBC (Cipher Block Chaining)**
-```
+
+```plaintext
 Bloque1 ⊕ IV → AES → CifradoBloque1
 Bloque2 ⊕ CifradoBloque1 → AES → CifradoBloque2
 ```
+
 **Características**:
+
 - Requiere Vector de Inicialización (IV) aleatorio
 - Error se propaga al siguiente bloque
 - No paralelizable para cifrado
 
 #### **3. GCM (Galois/Counter Mode) - ✅ RECOMENDADO**
-```
+
+```plaintext
 Counter+Nonce → AES → Keystream ⊕ Plaintext → Ciphertext + AuthTag
 ```
+
 **Ventajas**:
+
 - **AEAD**: Autenticación y cifrado simultáneo
 - **Paralelizable**: Extremadamente rápido
 - **Integridad**: Detecta modificaciones automáticamente
@@ -250,12 +286,14 @@ Counter+Nonce → AES → Keystream ⊕ Plaintext → Ciphertext + AuthTag
 ### Otros Algoritmos Simétricos
 
 #### **ChaCha20-Poly1305**
+
 - **Tipo**: Cifrado de flujo (stream cipher)
 - **Ventaja**: Más rápido que AES en software puro (sin hardware especializado)
 - **Clave**: 256 bits
 - **Uso**: Ideal para móviles y dispositivos IoT
 
 #### **DES y 3DES (Obsoletos)**
+
 - **DES**: 56 bits de clave efectiva (roto desde 1997)
 - **3DES**: Aplica DES tres veces (lento, en proceso de retirada)
 
@@ -265,13 +303,13 @@ Counter+Nonce → AES → Keystream ⊕ Plaintext → Ciphertext + AuthTag
 
 ## 4. Cifrado Asimétrico 🔑-🔐
 
-El cifrado asimétrico, también conocido como **criptografía de clave pública**, fue el gran avance que resolvió el problema de la distribución de claves del cifrado simétrico. 
+El cifrado asimétrico, también conocido como **criptografía de clave pública**, fue el gran avance que resolvió el problema de la distribución de claves del cifrado simétrico.
 
 ### Concepto Fundamental
 
 En este sistema revolucionario, **se utiliza un par de claves matemáticamente relacionadas**:
 
-```
+```plaintext
 Texto Plano + Clave Pública → [Algoritmo] → Texto Cifrado
 Texto Cifrado + Clave Privada → [Algoritmo] → Texto Plano
 ```
@@ -290,12 +328,14 @@ Texto Cifrado + Clave Privada → [Algoritmo] → Texto Plano
 ### Características Fundamentales
 
 #### **✅ Ventajas**
+
 - **Intercambio Seguro de Claves**: Resuelve el problema de la distribución
 - **Escalabilidad**: n usuarios solo necesitan n pares de claves
 - **Autenticación**: Permite verificar identidades
 - **No repudio**: Se puede probar quién envió un mensaje (firmas digitales)
 
 #### **❌ Desventajas**
+
 - **Lentitud**: 100-1000x más lento que el cifrado simétrico
 - **Tamaño**: Claves y texto cifrado mucho más grandes
 - **Complejidad**: Más propenso a errores de implementación
@@ -351,13 +391,18 @@ def rsa_decrypt(ciphertext, d, n):
 #### **¿Por qué funciona RSA?**
 
 La matemática se basa en el **Teorema de Euler**:
+
 - Si gcd(m, n) = 1, entonces m^φ(n) ≡ 1 (mod n)
 - Por construcción: m^(e×d) ≡ m^1 ≡ m (mod n)
 - Por tanto: (m^e)^d ≡ m (mod n)
 
 #### **Seguridad y Longitudes de Clave**
 
-La seguridad de RSA se basa en la **factorización de enteros grandes**:
+**Basada en**:
+
+- **Factorización de números primos**: La dificultad de factorizar un número entero grande (un semiprimo, que es el producto de dos números primos grandes) para garantizar la seguridad del cifrado.
+
+- **Problema del logaritmo discreto**: La dificultad de este problema radica en que calcular k a partir de g y a es computacionalmente muy difícil para k grandes, lo que lo convierte en una herramienta fundamental en la criptografía moderna.
 
 | Longitud | Estado | Uso Recomendado |
 |----------|--------|-----------------|
@@ -366,14 +411,23 @@ La seguridad de RSA se basa en la **factorización de enteros grandes**:
 | 3072 bits | ✅ Seguro | Nuevos sistemas |
 | 4096 bits | ✅ Máxima seguridad | Datos críticos |
 
+#### **Limitaciones de RSA**
+
+1. **Velocidad**: 100-1000x más lento que AES
+2. **Tamaño**: Clave y cifrado mucho más grandes
+3. **Quantum**: Vulnerable al algoritmo de Shor
+4. **Implementación**: Fácil de implementar mal
+
 ### Curvas Elípticas (ECC): La Alternativa Moderna
 
 #### **Ventajas sobre RSA**
+
 - **Claves más cortas**: 256-bit ECC ≈ 3072-bit RSA en seguridad
 - **Más rápido**: Especialmente en dispositivos móviles e IoT
 - **Menos memoria**: Importante para sistemas embebidos
 
 #### **Curvas Estándar**
+
 - **P-256**: NIST estándar, ampliamente soportado
 - **P-384**: Mayor seguridad para aplicaciones críticas
 - **Curve25519**: Diseño moderno y rápido
@@ -381,12 +435,30 @@ La seguridad de RSA se basa en la **factorización de enteros grandes**:
 
 ### Firmas Digitales: Autenticidad e Integridad
 
-Las firmas digitales permiten verificar:
+Las firmas digitales invierten el uso de las claves asimétricas para probar la identidad del emisor.
+
+**Proceso de Firma:**
+
+1. El emisor calcula el **hash** del mensaje.
+2. Cifra ese **hash** con su **clave privada**. El resultado es la **firma**.
+3. Envía el mensaje original + la firma.
+
+**Proceso de Verificación:**
+
+1. El receptor calcula el **hash** del mensaje recibido.
+2. Usa la **clave pública** del emisor para descifrar la firma y obtener el hash original.
+3. Compara los dos hashes. Si coinciden, se prueba:
+      - **Autenticidad**: El mensaje solo pudo ser firmado por el poseedor de la clave privada.
+      - **Integridad**: El mensaje no fue alterado (de lo contrario, los hashes no coincidirían).
+
+**En Resumen, Permiten verificar:**
+
 - **Autenticidad**: Quién envió el mensaje
-- **Integridad**: El mensaje no fue modificado  
+- **Integridad**: El mensaje no fue modificado
 - **No repudio**: El emisor no puede negar haberlo enviado
 
 #### **Proceso con RSA**
+
 ```python
 import hashlib
 
@@ -409,30 +481,6 @@ def verify_signature(message, signature, e, n):
     return hash_int == hash_recovered
 ```
 
-### El Uso Híbrido: Lo Mejor de Ambos Mundos
-
-La web moderna combina cifrado simétrico y asimétrico en un **esquema híbrido**. Así funciona **HTTPS (TLS/SSL)**:
-
-1. **Handshake TLS**: Navegador se conecta al servidor
-2. **Intercambio de Certificado**: Servidor envía su clave pública (en el certificado)
-3. **Generación de Clave de Sesión**: Navegador genera una clave simétrica aleatoria
-4. **Cifrado Asimétrico**: Navegador cifra la clave de sesión con la clave pública del servidor
-5. **Intercambio Seguro**: Clave de sesión cifrada se envía al servidor
-6. **Descifrado**: Servidor descifra la clave de sesión con su clave privada
-7. **Comunicación Simétrica**: Todo el tráfico posterior usa cifrado simétrico (rápido)
-
-```
-Cliente                              Servidor
-  |--- ClientHello ------------------>|
-  |<-- ServerHello + Certificate -----|
-  |--- ClientKeyExchange ------------>| (clave simétrica cifrada con RSA)
-  |<-- Finished ----------------------|
-  |--- Finished --------------------->|
-  |===== Datos con AES-256-GCM =======|
-```
-
-Este enfoque híbrido nos da la **seguridad** del intercambio asimétrico y la **velocidad** del cifrado simétrico.
-
 ---
 
 ## 5. Funciones Hash: La Huella Digital de los Datos
@@ -443,7 +491,7 @@ Una función hash criptográfica no es un algoritmo de encriptación, aunque a m
 
 Un hash toma una entrada de cualquier tamaño y produce una salida de tamaño fijo, llamada "resumen", "digest" o "hash".
 
-```
+```plaintext
 Entrada (cualquier tamaño) → [Función Hash] → Salida (tamaño fijo)
 "Hola Mundo" → [SHA-256] → "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e"
 ```
@@ -451,28 +499,34 @@ Entrada (cualquier tamaño) → [Función Hash] → Salida (tamaño fijo)
 ### Propiedades Fundamentales
 
 #### **1. Determinista**
+
 - La misma entrada siempre produce la misma salida
 - `hash("mensaje") = "abc123..."` (siempre)
 
 #### **2. Eficiente**
+
 - Calcular el hash de una entrada es rápido
 - Velocidades de ~500 MB/s para SHA-256
 
 #### **3. Resistencia a la Pre-imagen (Unidireccional)**
+
 - A partir de un hash, es computacionalmente inviable encontrar la entrada original
 - Dado `"abc123..."`, encontrar qué produjo este hash es imposible
 
 #### **4. Resistencia a la Segunda Pre-imagen**
+
 - Dada una entrada, es inviable encontrar otra entrada diferente que produzca el mismo hash
 - Si `hash(entrada1) = "abc123..."`, encontrar `entrada2` donde `hash(entrada2) = "abc123..."` es imposible
 
 #### **5. Resistencia a Colisiones**
+
 - Es inviable encontrar dos entradas diferentes que produzcan el mismo hash
 - `hash(entrada1) = hash(entrada2)` donde `entrada1 ≠ entrada2` debe ser imposible de encontrar
 
 #### **6. Efecto Avalancha**
+
 - Un pequeño cambio en la entrada causa un cambio drástico en la salida
-- `hash("Hola")` vs `hash("Holb")` → salidas completamente diferentes
+- `SHA256("hello")` vs `SHA256("Hello")` → salidas completamente diferentes
 
 > **Analogía 🧠:** Un hash es como una **huella digital** para los datos. Es única, fácil de tomar, pero es imposible reconstruir a la persona a partir de su huella. También se usa para verificar la **integridad**: si un solo bit del dato cambia, la huella digital (el hash) cambiará drásticamente.
 
@@ -481,13 +535,15 @@ Entrada (cualquier tamaño) → [Función Hash] → Salida (tamaño fijo)
 SHA es una familia de funciones hash criptográficas diseñadas por la NSA y estandarizadas por el NIST.
 
 #### **SHA-1 (160 bits) - ❌ OBSOLETO Y ROTO**
+
 - **Estado**: Vulnerabilidades de colisión demostradas (2017)
-- **Uso actual**: Solo para compatibilidad legacy
-- **Recomendación**: No usar para aplicaciones nuevas
+- **Uso actual**: Solo para compatibilidad legacy (Git aún lo usa)
+- **Recomendación**: No usar para aplicaciones nuevas. Reemplazar por SHA-256 o superior
 
 #### **SHA-2 Family - ✅ ESTÁNDAR ACTUAL**
 
 **SHA-256 (256 bits)**:
+
 ```javascript
 const crypto = require('crypto');
 
@@ -506,27 +562,34 @@ console.log(sha256("Hello Worlc")); // Un solo carácter diferente
 ```
 
 **Características de SHA-256**:
+
 - **Longitud de salida**: 256 bits (64 caracteres hexadecimales)
 - **Velocidad**: ~500 MB/s en hardware moderno
 - **Seguridad**: 128 bits de seguridad contra ataques de colisión
 - **Uso**: Bitcoin, certificados digitales, verificación de integridad
 
 **SHA-512 (512 bits)**:
+
 - **Mayor seguridad**: 256 bits de seguridad contra colisiones
 - **Más rápido**: En procesadores de 64 bits
 - **Uso**: Derivación de claves, aplicaciones de alta seguridad
 
 #### **SHA-3 (Keccak) - ✅ ALTERNATIVA MODERNA**
-- **Diseño**: Completamente diferente a SHA-2 (construcción de esponja)
+
+- **Diseño**: Basado en "construcción de esponja" (diferente a SHA-2)
 - **Propósito**: No fue creado porque SHA-2 estuviera roto, sino como alternativa robusta
 - **Ventajas**: Mejor resistencia contra ataques de extensión de longitud
-- **Adopción**: Menos común que SHA-2, pero igual de seguro
+- **Estado**: Estándar desde 2015, pero menos adoptado que SHA-2
+- **Variantes**: SHA3-224, SHA3-256, SHA3-384, SHA3-512
 
 ### Casos de Uso Principales
 
 #### **1. Almacenamiento Seguro de Contraseñas**
 
-**❌ NUNCA hacer esto:**
+**❌ NUNCA guardar contraseñas en texto plano, ni cifradas:** Se deben guardar *hasheadas*.
+
+**Hashing Simple (INCORRECTO):**
+
 ```javascript
 // MAL - Vulnerable a rainbow tables
 const plainPassword = "miPassword123";
@@ -535,6 +598,7 @@ const badHash = sha256(plainPassword);
 ```
 
 **✅ Forma correcta:**
+
 ```javascript
 const bcrypt = require('bcrypt');
 const argon2 = require('argon2');
@@ -544,23 +608,34 @@ const saltRounds = 12;
 const hashedPassword = await bcrypt.hash(password, saltRounds);
 
 // Usando Argon2 (recomendado)
-const hashedPassword = await argon2.hash(password, {
-    type: argon2.argon2id,
-    memoryCost: 2 ** 16,  // 64MB
-    timeCost: 3,          // 3 iteraciones
-    parallelism: 1,       // 1 hilo
-});
+async function hashPassword(password) {
+    // El salt se genera automáticamente
+    return await argon2.hash(password, {
+        type: argon2.argon2id, // La variante más resistente
+        memoryCost: 2 ** 16,  // 64MB de memoria
+        timeCost: 3,          // 3 iteraciones
+        parallelism: 1,       // Grado de paralelismo
+    });
+}
+
+async function verifyPassword(hash, password) {
+    return await argon2.verify(hash, password);
+}
 ```
 
 **¿Por qué algoritmos especiales para contraseñas?**
 
 - **SHA-256 es demasiado rápido**: Un atacante puede probar billones de combinaciones por segundo
 - **Necesitamos algoritmos lentos**: bcrypt, scrypt, Argon2 están diseñados para ser costosos
+  - Bcrypt: Un clásico muy robusto. Puede probar ~1000 contraseñas/segundo.
+  - scrypt: Diseñado para ser intensivo en memoria.
+  - Argon2: ✅ El estándar recomendado actualmente. Ganador de la Password Hashing Competition, es altamente resistente a ataques con hardware especializado (GPUs/ASICs).
 - **Resistencia a hardware**: Argon2 usa mucha memoria, dificultando ataques con GPU/ASIC
 
-#### **2. Mejorando el Hashing: Salt y Pepper**
+#### **1.2. Mejorando el Hashing: Salt y Pepper**
 
 **Salt (Sal)**: Cadena aleatoria única por cada usuario
+
 ```javascript
 function hashPasswordWithSalt(password) {
     const salt = crypto.randomBytes(32); // 32 bytes aleatorios
@@ -583,6 +658,7 @@ function verifyPassword(password, storedHash, storedSalt) {
 ```
 
 **Pepper (Pimienta)**: Secreto global de la aplicación
+
 ```javascript
 const APP_PEPPER = process.env.CRYPTO_PEPPER; // Variable de entorno
 
@@ -593,10 +669,13 @@ function hashPasswordWithSaltAndPepper(password, salt) {
 ```
 
 **Beneficios combinados**:
+
 - **Salt**: Previene ataques de rainbow tables y hace únicos hashes de contraseñas iguales
 - **Pepper**: Añade protección incluso si la base de datos es comprometida
 
-#### **3. Verificación de Integridad de Archivos (Checksums)**
+#### **2. Verificación de Integridad de Archivos (Checksums)**
+
+Un **checksum** es esencialmente una "huella digital" de un archivo:
 
 ```bash
 # Generar checksum
@@ -610,6 +689,7 @@ echo "f1d2d2f924e986ac86fdf7b36c94bcdf32beec15 archivo.txt" | sha256sum -c
 ```
 
 **Proceso de verificación**:
+
 1. El origen calcula y publica el hash del archivo
 2. Tú descargas el archivo
 3. Calculas el hash de tu copia local
@@ -617,9 +697,11 @@ echo "f1d2d2f924e986ac86fdf7b36c94bcdf32beec15 archivo.txt" | sha256sum -c
 5. **Si coinciden**: Archivo íntegro ✅
 6. **Si difieren**: Archivo corrupto o manipulado ❌
 
-#### **4. HMAC (Hash-based Message Authentication Code)**
+> **Analogía del Sello de Cera 📜:** Como un rey medieval que sella un pergamino con cera y su anillo. Si el sello está intacto, el mensaje no fue alterado.
 
-HMAC combina una función hash con una clave secreta para proporcionar autenticación:
+#### **3. HMAC (Hash-based Message Authentication Code)**
+
+HMAC proporciona **autenticación** e **integridad** usando una clave secreta:
 
 ```javascript
 const crypto = require('crypto');
@@ -640,14 +722,21 @@ function verifyHMAC(message, hmac, secretKey) {
     const calculatedHMAC = createHMAC(message, secretKey);
     return calculatedHMAC === hmac;
 }
+
+// El cliente envía: payload (mensaje) + signature (hmac)
+// El servidor verifica que el payload no fue modificado
+const isValid = verifyHMAC(secret, message, hmac);
 ```
 
 **Usos de HMAC**:
+
 - **JWT signatures**: Verificar que un token no fue modificado
 - **API authentication**: Firmar peticiones para verificar origen
 - **Webhooks**: Verificar que un webhook proviene del servicio correcto
 
-#### **5. Proof of Work (Blockchain)**
+#### **4. Proof of Work (Blockchain)**
+
+**Ejemplo:**
 
 ```javascript
 function mineBlock(data, difficulty) {
@@ -677,25 +766,57 @@ const result = mineBlock("Transaction: Alice -> Bob: 10 BTC", 4);
 
 ### Comparación de Algoritmos Hash
 
-| Algoritmo | Longitud | Velocidad | Seguridad | Estado | Uso Recomendado |
-|-----------|----------|-----------|-----------|--------|-----------------|
-| MD5 | 128 bits | ⭐⭐⭐⭐⭐ | ❌ Roto | Obsoleto | Solo checksums no críticos |
-| SHA-1 | 160 bits | ⭐⭐⭐⭐ | ❌ Roto | Obsoleto | Solo compatibilidad legacy |
-| SHA-256 | 256 bits | ⭐⭐⭐⭐ | ✅ Seguro | Estándar | Aplicaciones generales |
-| SHA-512 | 512 bits | ⭐⭐⭐ | ✅ Seguro | Estándar | Alta seguridad |
-| SHA-3 | Variable | ⭐⭐⭐ | ✅ Seguro | Moderno | Aplicaciones nuevas |
-| bcrypt | - | ⭐ | ✅ Seguro | Estándar | Contraseñas |
-| Argon2 | - | ⭐ | ✅ Seguro | Recomendado | Contraseñas modernas |
+| Algoritmo | Tipo | Velocidad | Seguridad | Uso Principal |
+| :--- | :--- | :---: | :---: | :--- |
+| **AES-256-GCM** | Simétrico | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Cifrado de datos en tránsito (TLS) y en reposo. |
+| **ChaCha20-Poly1305** | Simétrico | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Dispositivos móviles, IoT, software sin aceleración AES. |
+| **RSA-3072** | Asimétrico | ⭐⭐ | ⭐⭐⭐⭐ | Firmas digitales y certificados (PKI). |
+| **X25519 (ECC)** | Asimétrico | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Intercambio de claves (ECDH). El estándar en TLS 1.3. |
+| **Ed25519 (ECC)** | Asimétrico | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Firmas digitales modernas. Más rápido y seguro que RSA. |
+| **Argon2id** | Hash (KDF) | ⭐ | ⭐⭐⭐⭐⭐ | Almacenamiento de contraseñas. **Lento por diseño**. |
+| **SHA-256** | Hash | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | Firmas, integridad de archivos (checksums), blockchain. |
 
 ---
 
-## 6. Algoritmos de Cifrado Modernos
+## 6. Casos de Uso en la Web
 
-### Análisis Comparativo de Rendimiento
+La web moderna combina cifrado simétrico y asimétrico en un **esquema híbrido**. Así funciona **HTTPS (TLS/SSL)**:
+
+1. **Handshake TLS**: Navegador se conecta al servidor
+2. **Intercambio de Certificado**: Servidor envía su clave pública (en el certificado)
+3. **Generación de Clave de Sesión**: Navegador genera una clave simétrica aleatoria
+4. **Cifrado Asimétrico**: Navegador cifra la clave de sesión con la clave pública del servidor
+5. **Intercambio Seguro**: Clave de sesión cifrada se envía al servidor
+6. **Descifrado**: Servidor descifra la clave de sesión con su clave privada
+7. **Comunicación Simétrica**: Todo el tráfico posterior usa cifrado simétrico (rápido)
+
+```plaintext
+Cliente                              Servidor
+  |--- ClientHello ------------------>|
+  |<-- ServerHello + Certificate -----|
+  |--- ClientKeyExchange ------------>| (clave simétrica cifrada con RSA)
+  |<-- Finished ----------------------|
+  |--- Finished --------------------->|
+  |===== Datos con AES-256-GCM =======|
+```
+
+Este enfoque híbrido nos da la **seguridad** del intercambio asimétrico y la **velocidad** del cifrado simétrico.
+
+### **Resumen Comunicación de datos:**
+
+- Se genera clave simétrica temporal (AES-256)
+- Se intercambia usando RSA/ECC (lento, una sola vez)
+- Toda la comunicación posterior usa AES-256-GCM (rápido)
+
+---
+
+## 7. Análisis Comparativo de Rendimiento
+
+### Algoritmos Simétricos
 
 #### **AES vs ChaCha20: La Batalla por la Velocidad**
 
-```
+```plaintext
 Hardware/Contexto     | AES-256-GCM | ChaCha20-Poly1305
 ==================================================
 Intel con AES-NI      | 8-15 GB/s   | 1-2 GB/s
@@ -709,166 +830,30 @@ Microcontroladores    | 1-10 MB/s   | 5-20 MB/s
 #### **¿Cuándo usar cada uno?**
 
 **AES-256-GCM - Ideal para:**
+
 - Servidores con hardware Intel/AMD moderno
 - Aplicaciones que requieren máxima velocidad
 - Sistemas con aceleración hardware AES-NI
 - Compatibilidad máxima (estándar universal)
 
 **ChaCha20-Poly1305 - Ideal para:**
+
 - Dispositivos móviles e IoT
 - Sistemas sin aceleración hardware
 - JavaScript y aplicaciones web
 - Resistencia a ataques de timing
 
-### Cifrados Post-Cuánticos: Preparándose para el Futuro
+### Algoritmos Asimétricos
 
-#### **El Problema Cuántico**
-
-Las computadoras cuánticas representan una amenaza existencial para la criptografía actual:
-
-- **Algoritmo de Shor**: Puede factorizar números grandes eficientemente, rompiendo RSA y ECC
-- **Algoritmo de Grover**: Reduce la seguridad de algoritmos simétricos a la mitad
-
-**Cronología estimada**:
-- **2030-2035**: Computadoras cuánticas podrían romper RSA-2048
-- **2040-2050**: RSA-4096 y curvas elípticas en riesgo
-
-#### **Nuevos Estándares NIST (2024)**
-
-**1. CRYSTALS-Kyber** (Encapsulación de claves)
-- Basado en problemas de lattice (retículos)
-- Reemplazará RSA/ECC para intercambio de claves
-- Claves públicas: 800-1568 bytes
-
-**2. CRYSTALS-Dilithium** (Firmas digitales)
-- También basado en lattice
-- Reemplazará RSA/ECDSA para firmas
-- Firmas: 2420-4595 bytes
-
-**3. FALCON** (Firmas compactas)
-- Firmas más pequeñas que Dilithium
-- Mayor complejidad de implementación
-
-**4. SPHINCS+** (Firmas basadas en hash)
-- Basado solo en funciones hash (más conservador)
-- Firmas muy grandes pero máxima seguridad
-
-### Algoritmos de Cifrado por Flujo vs Bloque
-
-#### **Cifrado por Bloques (AES)**
-```
-Texto: "HOLAMUNDOXXXXXXX" (padding para completar bloques)
-       ↓
-[HOLA][MUND][OXXX] → AES → [a1b2][c3d4][e5f6]
-```
-
-#### **Cifrado por Flujo (ChaCha20)**
-```
-Texto: "HOLAMUNDO" (sin padding)
-       ↓
-H⊕k₁ O⊕k₂ L⊕k₃ A⊕k₄ M⊕k₅ U⊕k₆ N⊕k₇ D⊕k₈ O⊕k₉
-```
-
-### Implementación Práctica: Comparación de Bibliotecas
-
-#### **Node.js - Crypto Nativo**
-```javascript
-const crypto = require('crypto');
-
-// AES-256-GCM
-function encryptAES(text, password) {
-    const salt = crypto.randomBytes(32);
-    const key = crypto.scryptSync(password, salt, 32);
-    const nonce = crypto.randomBytes(12);
-    
-    const cipher = crypto.createCipher('aes-256-gcm');
-    cipher.setAAD(Buffer.from('aes-encryption'));
-    
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    const authTag = cipher.getAuthTag();
-    
-    return {
-        encrypted,
-        salt: salt.toString('hex'),
-        nonce: nonce.toString('hex'),
-        authTag: authTag.toString('hex')
-    };
-}
-
-// ChaCha20-Poly1305
-function encryptChaCha20(text, password) {
-    const salt = crypto.randomBytes(32);
-    const key = crypto.scryptSync(password, salt, 32);
-    const nonce = crypto.randomBytes(12);
-    
-    const cipher = crypto.createCipher('chacha20-poly1305');
-    cipher.setAAD(Buffer.from('chacha20-encryption'));
-    
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    const authTag = cipher.getAuthTag();
-    
-    return {
-        encrypted,
-        salt: salt.toString('hex'),
-        nonce: nonce.toString('hex'),
-        authTag: authTag.toString('hex')
-    };
-}
-```
-
-#### **Python - Cryptography Library**
-```python
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-import os
-
-def encrypt_aes_gcm(plaintext: bytes, password: bytes) -> dict:
-    salt = os.urandom(32)
-    kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
-        length=32,
-        salt=salt,
-        iterations=100000,
-    )
-    key = kdf.derive(password)
-    
-    nonce = os.urandom(12)  # 96 bits para GCM
-    cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
-    encryptor = cipher.encryptor()
-    
-    ciphertext = encryptor.update(plaintext) + encryptor.finalize()
-    
-    return {
-        'ciphertext': ciphertext,
-        'salt': salt,
-        'nonce': nonce,
-        'auth_tag': encryptor.tag
-    }
-```
-
-### Tabla Comparativa Completa
-
-| Algoritmo | Tipo | Velocidad | Seguridad | Tamaño Clave | Resistencia Cuántica | Uso Principal |
-|-----------|------|-----------|-----------|--------------|---------------------|---------------|
-| **AES-256-GCM** | Simétrico | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | 256 bits | ⭐⭐⭐ | Cifrado de datos |
-| **ChaCha20-Poly1305** | Simétrico | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | 256 bits | ⭐⭐⭐ | Móviles/IoT |
-| **RSA-4096** | Asimétrico | ⭐⭐ | ⭐⭐⭐⭐ | 4096 bits | ❌ | PKI legacy |
-| **P-384** | ECC | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | 384 bits | ❌ | PKI moderno |
-| **Ed25519** | ECC | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | 255 bits | ❌ | Firmas rápidas |
-| **X25519** | ECC | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | 255 bits | ❌ | Intercambio claves |
-| **Kyber-1024** | Post-cuántico | ⭐⭐ | ⭐⭐⭐⭐⭐ | ~1568 bytes | ⭐⭐⭐⭐⭐ | Futuro - intercambio |
-| **Dilithium-5** | Post-cuántico | ⭐ | ⭐⭐⭐⭐⭐ | ~4595 bytes | ⭐⭐⭐⭐⭐ | Futuro - firmas |
+#### **RSA vs Eval: La Batalla por la Velocidad**
 
 ---
 
-## 7. Patrones de Seguridad Web Aplicados
+## 8. Patrones de Seguridad Web Aplicados
 
 Ahora unamos todo el conocimiento teórico con la implementación práctica. ¿Cómo se manifiestan estos conceptos en el día a día de un desarrollador Full Stack?
 
-### Pattern 1: Protección de Datos en Tránsito (HTTPS/TLS)
+### Pattern 1: Asegurar Datos en Tránsito (HTTPS/TLS)
 
 #### **El Protocolo TLS 1.3: Handshake Optimizado**
 
@@ -890,12 +875,14 @@ Cliente                              Servidor
 ```
 
 **Tecnologías utilizadas**:
+
 - **Intercambio de claves**: X25519 (ECDH) o RSA-4096
 - **Autenticación**: Ed25519, ECDSA P-384, o RSA-PSS
 - **Cifrado simétrico**: AES-256-GCM o ChaCha20-Poly1305
 - **Hash**: SHA-256 o SHA-384
 
 #### **Configuración Nginx Segura (2024)**
+
 ```nginx
 server {
     listen 443 ssl http2;
@@ -931,7 +918,7 @@ server {
 }
 ```
 
-### Pattern 2: Almacenamiento Seguro de Credenciales
+### Pattern 2: Asegurar Datos en Reposo (Bases de Datos y Archivos)
 
 #### **Sistema Completo de Gestión de Contraseñas**
 
