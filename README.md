@@ -22,13 +22,11 @@ Esta es una documentación completa sobre cifrado y encriptación, diseñada par
 
 Para empezar, aclaremos los términos. Aunque a menudo se usan indistintamente, tienen matices específicos:
 
-### Terminología y Conceptos Básicos
+### Conceptos Básicos
 
 - **Criptografía**: Es la **disciplina** o el campo de estudio de las técnicas de comunicación segura en presencia de terceros (adversarios). Abarca mucho más que solo "esconder" mensajes; incluye técnicas para la autenticación, integridad de datos y no repudio. Es el paraguas que lo cubre todo.
 
 - **Cifrado o Encriptación**: Estos dos términos **son sinónimos**. Se refieren al **proceso** específico de tomar un mensaje legible (llamado *texto plano* o *plaintext*) y convertirlo en un formato ilegible (llamado *texto cifrado* o *ciphertext*) usando un algoritmo y una clave.
-
-- **Descifrado o Desencriptación**: Es el proceso inverso: convertir el texto cifrado de nuevo a texto plano, usando la clave correcta.
 
 > **No hay diferencia práctica** entre "encriptación" y "cifrado" en el contexto de seguridad informática. Ambos términos se usan intercambiablemente.
 > **Analogía 🧠:** Piensa en la **Criptografía** como la *ingeniería de cerraduras y cajas fuertes*. La **Encriptación** sería el *acto de girar la llave para cerrar la caja fuerte*.
@@ -40,8 +38,8 @@ Para empezar, aclaremos los términos. Aunque a menudo se usan indistintamente, 
 ##### Algoritmo de Cifrado
 
 - Función matemática que realiza la transformación de datos
-- Ejemplos: AES, RSA, ChaCha20, Ed25519
 - Debe ser público y ampliamente auditado
+- Ejemplos: AES, RSA, ChaCha20, Ed25519
 
 ##### Clave (Key)
 
@@ -139,7 +137,7 @@ Para empezar, aclaremos los términos. Aunque a menudo se usan indistintamente, 
 
 - Proporciona confidencialidad, autenticidad e integridad
 - Ejemplo: AES-GCM, ChaCha20-Poly1305
-- Estándar recomendado para nuevas implementaciones
+- Estándar moderno para cifrado autenticado
 
 ##### PFS (Perfect Forward Secrecy)
 
@@ -151,7 +149,7 @@ Para empezar, aclaremos los términos. Aunque a menudo se usan indistintamente, 
 
 - Protocolo para comunicación segura en redes
 - Evolución de SSL
-- Versión actual recomendada: TLS 1.3
+- Estándar para HTTPS
 
 ##### PKI (Public Key Infrastructure)
 
@@ -164,52 +162,6 @@ Para empezar, aclaremos los términos. Aunque a menudo se usan indistintamente, 
 - Dispositivo físico que protege y gestiona claves
 - Proporciona mayor seguridad que software
 - Usado en aplicaciones críticas
-
-#### Ataques y Vulnerabilidades
-
-##### Ataque de Fuerza Bruta
-
-- Intento sistemático de todas las combinaciones posibles
-- Mitigación: claves largas y algoritmos lentos
-
-##### Rainbow Tables
-
-- Tablas precomputadas de hashes comunes
-- Mitigación: uso de salt único
-
-##### MITM (Man-in-the-Middle)
-
-- Interceptación de comunicaciones
-- Mitigación: verificación de certificados y pinning
-
-##### Side-Channel Attacks
-
-- Explotan información filtrada (tiempo, energía, emisiones)
-- Mitigación: implementaciones resistentes a timing
-
-#### Algoritmos Recomendados
-
-##### Cifrado Simétrico Moderno
-
-- **AES-256-GCM**: Estándar universal
-- **ChaCha20-Poly1305**: Software sin aceleración hardware
-
-##### Cifrado Asimétrico Moderno
-
-- **RSA-3072+**: Compatibilidad con sistemas legacy
-- **Ed25519**: Firmas digitales modernas
-- **X25519**: Intercambio de claves ECDH
-
-##### Funciones Hash Seguras
-
-- **SHA-256, SHA-3**: Integridad general
-- **Argon2id**: Almacenamiento de contraseñas
-
-##### Algoritmos Obsoletos (No Usar)
-
-- **DES, 3DES**: Reemplazar por AES
-- **SHA-1**: Reemplazar por SHA-256+
-- **RSA-1024**: Vulnerable, usar RSA-3072+
 
 ### Principios de Seguridad (CIA Triad)
 
