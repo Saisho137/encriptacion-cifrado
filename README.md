@@ -1084,78 +1084,76 @@ const storageImpact = {
 
 ## 9. Patrones de Seguridad Web Aplicados
 
-Ahora unamos todo el conocimiento teórico con la implementación práctica. ¿Cómo se manifiestan estos conceptos en el día a día de un desarrollador Full Stack?
+Esta sección transforma la teoría criptográfica en implementaciones prácticas para desarrolladores Full Stack. Cada patrón está basado en estándares de la industria y mejores prácticas verificadas.
 
-<!-- TODO: Refinar el contenido de los Pattern. -->
+> **⚠️ Disclaimer de Seguridad:** Los ejemplos mostrados son para fines educativos. En producción, usa siempre librerías criptográficas auditadas como `libsodium`, `OpenSSL`, o las APIs nativas de tu plataforma.
 
-### Pattern 1: Asegurar Datos en Tránsito (HTTPS/TLS)
+### Pattern 1: Comunicación Segura (TLS/HTTPS)
 
-#### **El Protocolo TLS 1.3: Handshake Optimizado**
+#### **Fundamentos del Handshake TLS 1.3**
+
+TLS 1.3 representa la evolución más significativa del protocolo, reduciendo los round-trips y eliminando algoritmos inseguros:
 
 ```plaintext
 Cliente                              Servidor
   |--- ClientHello ------------------>|
-  |    (cipher suites, key shares)    |
+  |    (cipher suites + key_share)    |
   |                                   |
   |<-- ServerHello -------------------|  
-  |    (selected cipher, key share)   |
+  |    (cipher + key_share + cert)    |
   |<-- {EncryptedExtensions} ---------|
-  |<-- {Certificate} -----------------|
   |<-- {CertificateVerify} -----------|
-  |<-- {Finished} -------------------|
+  |<-- {Finished} --------------------|
   |                                   |
-  |--- {Finished} ------------------>|
+  |--- {Finished} ------------------->|
   |                                   |
-  |===== Datos con AES-256-GCM =======|
+  |===== Comunicación Cifrada ========|
 ```
 
-**Tecnologías utilizadas**:
+**Stack tecnológico recomendado:**
 
-- **Intercambio de claves**: X25519 (ECDH) o RSA-4096
-- **Autenticación**: Ed25519, ECDSA P-384, o RSA-PSS
-- **Cifrado simétrico**: AES-256-GCM o ChaCha20-Poly1305
+- **Key Exchange**: X25519 (ECDH)
+- **Authentication**: Ed25519, ECDSA P-384, o RSA-PSS
+- **Symmetric Cipher**: AES-256-GCM o ChaCha20-Poly1305
 - **Hash**: SHA-256 o SHA-384
 
-#### **Configuración Nginx Segura (2024)**
+#### **Configuración Básica de Servidor Web**
 
 ```nginx
 server {
     listen 443 ssl http2;
-    listen [::]:443 ssl http2;
     
     # Certificados
     ssl_certificate /path/to/fullchain.pem;
-    ssl_certificate_key /path/to/private.key;
+    ssl_certificate_key /path/to/privkey.pem;
     
-    # Protocolos seguros únicamente
+    # Solo protocolos seguros
     ssl_protocols TLSv1.2 TLSv1.3;
-    
-    # Cipher suites modernas
-    ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
     ssl_prefer_server_ciphers off;
     
-    # Curvas elípticas seguras
-    ssl_ecdh_curve X25519:prime256v1:secp384r1;
-    
-    # HSTS (HTTP Strict Transport Security)
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    
-    # OCSP Stapling para verificación de certificados
-    ssl_stapling on;
-    ssl_stapling_verify on;
-    ssl_trusted_certificate /path/to/chain.pem;
-    
-    # Configuraciones adicionales de seguridad
+    # Headers de seguridad esenciales
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
     add_header X-Frame-Options DENY always;
     add_header X-Content-Type-Options nosniff always;
-    add_header Referrer-Policy strict-origin-when-cross-origin always;
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" always;
+    add_header Content-Security-Policy "default-src 'self'" always;
+}
+
+# Redirección HTTP → HTTPS
+server {
+    listen 80;
+    return 301 https://$server_name$request_uri;
 }
 ```
 
-### Pattern 2: Asegurar Datos en Reposo (Bases de Datos y Archivos)
+### Pattern 2: Gestión Segura de Autenticación
 
-#### **Sistema Completo de Gestión de Contraseñas**
+#### **Almacenamiento de Contraseñas con Argon2id**
+
+**Concepto clave:** Las contraseñas nunca se almacenan directamente, sino que se procesan con:
+
+1. **Salt único** por usuario (previene rainbow tables)
+2. **Pepper global** de la aplicación (protección adicional)
+3. **Argon2id** algoritmo resistente a ataques de hardware
 
 ```javascript
 const argon2 = require('argon2');
@@ -1163,153 +1161,41 @@ const crypto = require('crypto');
 
 class SecurePasswordManager {
     constructor() {
-        this.pepper = process.env.CRYPTO_PEPPER;
-        if (!this.pepper) {
-            throw new Error('CRYPTO_PEPPER environment variable required');
-        }
+        this.pepper = process.env.CRYPTO_PEPPER; // Secreto global
+        this.argonConfig = {
+            type: argon2.argon2id,
+            memoryCost: 2 ** 16,    // 64MB memoria
+            timeCost: 3,            // 3 iteraciones
+            parallelism: 1          // 1 hilo
+        };
     }
     
-    /**
-     * Hash una contraseña con salt y pepper
-     */
     async hashPassword(password) {
-        // Generar salt único para este usuario
         const salt = crypto.randomBytes(32);
-        
-        // Combinar password + salt + pepper
         const combined = password + salt.toString('hex') + this.pepper;
         
-        // Usar Argon2id con configuración robusta
-        const hash = await argon2.hash(combined, {
-            type: argon2.argon2id,
-            memoryCost: 2 ** 16,    // 64MB de memoria
-            timeCost: 3,            // 3 iteraciones
-            parallelism: 1,         // 1 hilo
-            hashLength: 32          // 256 bits de salida
-        });
+        const hash = await argon2.hash(combined, this.argonConfig);
         
         return {
             hash,
             salt: salt.toString('hex'),
-            algorithm: 'argon2id',
-            params: { memoryCost: 65536, timeCost: 3, parallelism: 1 }
+            algorithm: 'argon2id'
         };
     }
     
-    /**
-     * Verificar contraseña
-     */
     async verifyPassword(password, storedHash, storedSalt) {
         const combined = password + storedSalt + this.pepper;
-        
-        try {
-            return await argon2.verify(storedHash, combined);
-        } catch (err) {
-            // Log del intento fallido para detección de ataques
-            console.error('Password verification failed:', err);
-            return false;
-        }
-    }
-    
-    /**
-     * Verificar si el hash necesita actualizarse (rehashing)
-     */
-    needsRehash(storedHash) {
-        return argon2.needsRehash(storedHash, {
-            type: argon2.argon2id,
-            memoryCost: 2 ** 16,
-            timeCost: 3,
-            parallelism: 1
-        });
+        return await argon2.verify(storedHash, combined);
     }
 }
 ```
 
-#### **Modelo de Usuario con Cifrado de Datos Sensibles**
+#### **Gestión de Sesiones con JWT**
 
-```javascript
-const crypto = require('crypto');
+**Concepto:** Usar dos tipos de tokens para balancear seguridad y usabilidad:
 
-class SecureUserModel {
-    constructor(encryptionKey) {
-        this.key = Buffer.from(encryptionKey, 'hex');
-        this.algorithm = 'aes-256-gcm';
-    }
-    
-    /**
-     * Cifrar datos sensibles (PII)
-     */
-    encryptPII(data) {
-        const nonce = crypto.randomBytes(12); // 96 bits para GCM
-        const cipher = crypto.createCipher(this.algorithm);
-        cipher.setAAD(Buffer.from('user-pii-encryption'));
-        
-        let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'hex');
-        encrypted += cipher.final('hex');
-        const authTag = cipher.getAuthTag();
-        
-        return {
-            data: encrypted,
-            nonce: nonce.toString('hex'),
-            authTag: authTag.toString('hex'),
-            algorithm: this.algorithm
-        };
-    }
-    
-    /**
-     * Descifrar datos sensibles
-     */
-    decryptPII(encryptedData) {
-        const decipher = crypto.createDecipher(this.algorithm);
-        decipher.setAAD(Buffer.from('user-pii-encryption'));
-        decipher.setAuthTag(Buffer.from(encryptedData.authTag, 'hex'));
-        
-        let decrypted = decipher.update(encryptedData.data, 'hex', 'utf8');
-        decrypted += decipher.final('utf8');
-        
-        return JSON.parse(decrypted);
-    }
-    
-    /**
-     * Crear usuario con datos cifrados
-     */
-    async createUser(userData) {
-        const passwordManager = new SecurePasswordManager();
-        
-        // Hash de la contraseña
-        const passwordData = await passwordManager.hashPassword(userData.password);
-        
-        // Cifrar datos sensibles
-        const sensitiveData = {
-            fullName: userData.fullName,
-            dateOfBirth: userData.dateOfBirth,
-            ssn: userData.ssn,
-            address: userData.address
-        };
-        const encryptedPII = this.encryptPII(sensitiveData);
-        
-        // Datos públicos (no cifrados)
-        const publicData = {
-            id: crypto.randomUUID(),
-            email: userData.email,
-            username: userData.username,
-            createdAt: new Date().toISOString(),
-            lastLogin: null
-        };
-        
-        return {
-            ...publicData,
-            passwordHash: passwordData.hash,
-            passwordSalt: passwordData.salt,
-            encryptedData: encryptedPII
-        };
-    }
-}
-```
-
-### Pattern 3: Autenticación y Autorización con JWT
-
-#### **Implementación JWT Segura con Rotación de Tokens**
+- **Access Token**: Corta duración (15 min), contiene permisos
+- **Refresh Token**: Larga duración (7 días), solo para renovar
 
 ```javascript
 const jwt = require('jsonwebtoken');
@@ -1317,331 +1203,258 @@ const crypto = require('crypto');
 
 class SecureJWTManager {
     constructor() {
-        this.accessTokenSecret = process.env.JWT_ACCESS_SECRET;
-        this.refreshTokenSecret = process.env.JWT_REFRESH_SECRET;
-        this.accessTokenExpiry = '15m';
-        this.refreshTokenExpiry = '7d';
-        
-        // Redis o base de datos para blacklist
-        this.tokenBlacklist = new Set();
+        this.accessSecret = process.env.JWT_ACCESS_SECRET;
+        this.refreshSecret = process.env.JWT_REFRESH_SECRET;
+        this.accessExpiry = '15m';
+        this.refreshExpiry = '7d';
     }
     
-    /**
-     * Generar par de tokens (access + refresh)
-     */
-    generateTokenPair(userId, userRole, sessionId = null) {
-        const sessionIdentifier = sessionId || crypto.randomUUID();
-        const currentTime = Math.floor(Date.now() / 1000);
+    generateTokenPair(userId, userRole) {
+        const sessionId = crypto.randomUUID();
         
-        // Access Token (corto, con permisos)
-        const accessPayload = {
-            sub: userId,                    // Subject (user ID)
-            role: userRole,                 // Role-based permissions
-            session: sessionIdentifier,     // Session identifier
-            type: 'access',                 // Token type
-            iat: currentTime,              // Issued at
-            aud: 'my-app-users'            // Audience
-        };
-        
+        // Access Token - permisos y datos de sesión
         const accessToken = jwt.sign(
-            accessPayload,
-            this.accessTokenSecret,
-            { 
-                algorithm: 'HS256',
-                expiresIn: this.accessTokenExpiry,
-                issuer: 'my-app-auth-service'
-            }
+            { sub: userId, role: userRole, session: sessionId, type: 'access' },
+            this.accessSecret,
+            { expiresIn: this.accessExpiry, algorithm: 'HS256' }
         );
         
-        // Refresh Token (largo, solo para renovación)
-        const refreshPayload = {
-            sub: userId,
-            session: sessionIdentifier,
-            type: 'refresh',
-            iat: currentTime,
-            aud: 'my-app-refresh'
-        };
-        
+        // Refresh Token - solo para renovación
         const refreshToken = jwt.sign(
-            refreshPayload,
-            this.refreshTokenSecret,
-            {
-                algorithm: 'HS256',
-                expiresIn: this.refreshTokenExpiry,
-                issuer: 'my-app-auth-service'
-            }
+            { sub: userId, session: sessionId, type: 'refresh' },
+            this.refreshSecret,
+            { expiresIn: this.refreshExpiry, algorithm: 'HS256' }
         );
         
-        return {
-            accessToken,
-            refreshToken,
-            sessionId: sessionIdentifier,
-            expiresIn: 900 // 15 minutos en segundos
-        };
+        return { accessToken, refreshToken, expiresIn: 15 * 60 };
     }
     
-    /**
-     * Verificar y renovar access token usando refresh token
-     */
-    async refreshAccessToken(refreshToken) {
-        try {
-            // Verificar refresh token
-            const decoded = jwt.verify(refreshToken, this.refreshTokenSecret, {
-                algorithms: ['HS256'],
-                issuer: 'my-app-auth-service',
-                audience: 'my-app-refresh'
-            });
-            
-            // Validaciones adicionales
-            if (decoded.type !== 'refresh') {
-                throw new Error('Invalid token type');
-            }
-            
-            // Verificar que no esté en blacklist
-            if (await this.isTokenBlacklisted(refreshToken)) {
-                throw new Error('Token has been revoked');
-            }
-            
-            // Obtener información actualizada del usuario
-            const user = await this.getUserById(decoded.sub);
-            if (!user || !user.active) {
-                throw new Error('User not found or inactive');
-            }
-            
-            // Generar nuevo par de tokens
-            return this.generateTokenPair(
-                decoded.sub, 
-                user.role, 
-                decoded.session
-            );
-            
-        } catch (error) {
-            throw new Error(`Token refresh failed: ${error.message}`);
-        }
-    }
-    
-    /**
-     * Verificar access token
-     */
-    verifyAccessToken(accessToken) {
-        try {
-            const decoded = jwt.verify(accessToken, this.accessTokenSecret, {
-                algorithms: ['HS256'],
-                issuer: 'my-app-auth-service',
-                audience: 'my-app-users'
-            });
-            
-            if (decoded.type !== 'access') {
-                throw new Error('Invalid token type');
-            }
-            
-            return decoded;
-        } catch (error) {
-            throw new Error(`Token verification failed: ${error.message}`);
-        }
-    }
-    
-    /**
-     * Revocar token (agregar a blacklist)
-     */
-    async revokeToken(token) {
-        this.tokenBlacklist.add(token);
-        // En producción, guardar en Redis con TTL igual al tiempo restante del token
-        const decoded = jwt.decode(token);
-        const ttl = decoded.exp - Math.floor(Date.now() / 1000);
-        // redis.setex(token, ttl, 'revoked');
-    }
-    
-    /**
-     * Verificar si token está en blacklist
-     */
-    async isTokenBlacklisted(token) {
-        return this.tokenBlacklist.has(token);
-        // En producción: return await redis.exists(token);
-    }
-    
-    /**
-     * Cerrar todas las sesiones de un usuario
-     */
-    async revokeAllUserTokens(userId) {
-        // Implementar lógica para invalidar todos los tokens de un usuario
-        // Esto requiere mantener un registro de sesiones activas
+    verifyAccessToken(token) {
+        return jwt.verify(token, this.accessSecret, { algorithms: ['HS256'] });
     }
 }
 ```
 
-### Pattern 4: Verificación de Integridad Avanzada
+### Pattern 3: Cifrado de Datos Sensibles (PII)
 
-#### **Sistema de Verificación de Integridad de Archivos con Metadatos**
+#### **Cifrado a Nivel de Aplicación**
+
+**Concepto:** Cifrar datos sensibles antes de almacenarlos, usando contexto para mayor seguridad.
+
+```javascript
+const crypto = require('crypto');
+
+class ApplicationEncryption {
+    constructor(masterKey) {
+        this.masterKey = Buffer.from(masterKey, 'hex');
+        this.algorithm = 'aes-256-gcm';
+    }
+    
+    encryptData(plaintext, context = '') {
+        const iv = crypto.randomBytes(12); // IV único
+        const cipher = crypto.createCipherGCM(this.algorithm, this.masterKey);
+        cipher.setInitializationVector(iv);
+        
+        // Contexto como datos adicionales autenticados
+        if (context) {
+            cipher.setAAD(Buffer.from(context, 'utf8'));
+        }
+        
+        let encrypted = cipher.update(plaintext, 'utf8');
+        encrypted = Buffer.concat([encrypted, cipher.final()]);
+        const authTag = cipher.getAuthTag();
+        
+        return JSON.stringify({
+            iv: iv.toString('base64'),
+            authTag: authTag.toString('base64'),
+            ciphertext: encrypted.toString('base64'),
+            context
+        });
+    }
+    
+    decryptData(encryptedData, expectedContext = '') {
+        const data = JSON.parse(encryptedData);
+        
+        // Validar contexto
+        if (expectedContext && data.context !== expectedContext) {
+            throw new Error('Context mismatch');
+        }
+        
+        const decipher = crypto.createDecipherGCM(this.algorithm, this.masterKey);
+        decipher.setInitializationVector(Buffer.from(data.iv, 'base64'));
+        decipher.setAuthTag(Buffer.from(data.authTag, 'base64'));
+        
+        if (data.context) {
+            decipher.setAAD(Buffer.from(data.context, 'utf8'));
+        }
+        
+        let decrypted = decipher.update(Buffer.from(data.ciphertext, 'base64'));
+        decrypted = Buffer.concat([decrypted, decipher.final()]);
+        
+        return decrypted.toString('utf8');
+    }
+}
+
+// Uso para datos de usuario
+class SecureUserDataManager {
+    constructor(encryptionKey) {
+        this.encryption = new ApplicationEncryption(encryptionKey);
+    }
+    
+    encryptPII(userData, userId) {
+        const context = `user:${userId}:pii`;
+        const sensitiveFields = {
+            fullName: userData.fullName,
+            ssn: userData.ssn,
+            address: userData.address
+        };
+        
+        return this.encryption.encryptData(JSON.stringify(sensitiveFields), context);
+    }
+    
+    decryptPII(encryptedPII, userId) {
+        const context = `user:${userId}:pii`;
+        const decryptedJson = this.encryption.decryptData(encryptedPII, context);
+        return JSON.parse(decryptedJson);
+    }
+}
+```
+
+### Pattern 4: Verificación de Integridad
+
+#### **Sistema de Checksums**
+
+**Concepto:** Verificar que los datos no han sido modificados usando hashes criptográficos.
 
 ```javascript
 const crypto = require('crypto');
 const fs = require('fs').promises;
 
-class FileIntegrityManager {
+class IntegrityManager {
     constructor() {
         this.algorithm = 'sha256';
-        this.blockSize = 1024 * 1024; // 1MB bloques para archivos grandes
     }
     
-    /**
-     * Calcular hash de archivo con metadatos
-     */
-    async calculateFileFingerprint(filePath) {
-        try {
-            const stats = await fs.stat(filePath);
-            const fileHandle = await fs.open(filePath, 'r');
-            
-            // Hash del contenido
-            const contentHash = crypto.createHash(this.algorithm);
-            const buffer = Buffer.alloc(this.blockSize);
-            let position = 0;
-            
-            while (position < stats.size) {
-                const { bytesRead } = await fileHandle.read(buffer, 0, this.blockSize, position);
-                if (bytesRead === 0) break;
-                
-                contentHash.update(buffer.subarray(0, bytesRead));
-                position += bytesRead;
-            }
-            
-            await fileHandle.close();
-            
-            // Crear fingerprint completo
-            const fingerprint = {
-                contentHash: contentHash.digest('hex'),
-                size: stats.size,
-                lastModified: stats.mtime.toISOString(),
-                algorithm: this.algorithm,
-                timestamp: new Date().toISOString()
-            };
-            
-            // Hash del fingerprint completo
-            const metaHash = crypto.createHash(this.algorithm)
-                .update(JSON.stringify(fingerprint))
-                .digest('hex');
-            
-            return {
-                ...fingerprint,
-                metaHash
-            };
-            
-        } catch (error) {
-            throw new Error(`Failed to calculate file fingerprint: ${error.message}`);
-        }
-    }
-    
-    /**
-     * Verificar integridad de archivo
-     */
-    async verifyFileIntegrity(filePath, expectedFingerprint) {
-        const currentFingerprint = await this.calculateFileFingerprint(filePath);
+    async calculateFileChecksum(filePath) {
+        const fileBuffer = await fs.readFile(filePath);
+        const hash = crypto.createHash(this.algorithm);
+        hash.update(fileBuffer);
         
-        const verification = {
-            isValid: currentFingerprint.contentHash === expectedFingerprint.contentHash,
-            sizeMatches: currentFingerprint.size === expectedFingerprint.size,
-            hashMatches: currentFingerprint.contentHash === expectedFingerprint.contentHash,
-            currentHash: currentFingerprint.contentHash,
-            expectedHash: expectedFingerprint.contentHash,
-            sizeChanged: currentFingerprint.size !== expectedFingerprint.size,
-            timeChanged: currentFingerprint.lastModified !== expectedFingerprint.lastModified
-        };
-        
-        return verification;
-    }
-    
-    /**
-     * Generar checksum para múltiples archivos
-     */
-    async generateManifest(filesList) {
-        const manifest = {
-            created: new Date().toISOString(),
+        return {
+            path: filePath,
+            checksum: hash.digest('hex'),
+            size: fileBuffer.length,
             algorithm: this.algorithm,
-            files: {}
+            timestamp: new Date().toISOString()
         };
-        
-        for (const filePath of filesList) {
-            try {
-                manifest.files[filePath] = await this.calculateFileFingerprint(filePath);
-            } catch (error) {
-                manifest.files[filePath] = { error: error.message };
-            }
-        }
-        
-        // Hash del manifest completo
-        manifest.manifestHash = crypto.createHash(this.algorithm)
-            .update(JSON.stringify(manifest.files))
-            .digest('hex');
-        
-        return manifest;
     }
     
-    /**
-     * Verificar integridad usando manifest
-     */
-    async verifyManifest(filesList, manifest) {
-        const results = {
-            overallValid: true,
-            fileResults: {},
-            summary: {
-                total: filesList.length,
-                valid: 0,
-                invalid: 0,
-                missing: 0
-            }
+    async verifyFileIntegrity(filePath, expectedChecksum) {
+        const current = await this.calculateFileChecksum(filePath);
+        return {
+            isValid: current.checksum === expectedChecksum,
+            currentChecksum: current.checksum,
+            expectedChecksum
         };
+    }
+    
+    // HMAC para autenticación de datos
+    generateHMAC(data, secret) {
+        return crypto.createHmac(this.algorithm, secret)
+            .update(data)
+            .digest('hex');
+    }
+    
+    verifyHMAC(data, signature, secret) {
+        const expected = this.generateHMAC(data, secret);
+        const expectedBuffer = Buffer.from(expected, 'hex');
+        const receivedBuffer = Buffer.from(signature, 'hex');
         
-        for (const filePath of filesList) {
-            if (!manifest.files[filePath]) {
-                results.fileResults[filePath] = { status: 'not_in_manifest' };
-                results.summary.missing++;
-                results.overallValid = false;
-                continue;
-            }
-            
-            try {
-                const verification = await this.verifyFileIntegrity(
-                    filePath, 
-                    manifest.files[filePath]
-                );
-                
-                results.fileResults[filePath] = verification;
-                
-                if (verification.isValid) {
-                    results.summary.valid++;
-                } else {
-                    results.summary.invalid++;
-                    results.overallValid = false;
-                }
-            } catch (error) {
-                results.fileResults[filePath] = { status: 'error', error: error.message };
-                results.summary.invalid++;
-                results.overallValid = false;
-            }
-        }
-        
-        return results;
+        return expectedBuffer.length === receivedBuffer.length &&
+               crypto.timingSafeEqual(expectedBuffer, receivedBuffer);
     }
 }
-
-// Uso práctico
-const integrityManager = new FileIntegrityManager();
-
-// Crear manifest de archivos críticos
-const criticalFiles = [
-    '/app/config/production.json',
-    '/app/dist/bundle.js',
-    '/app/package.json'
-];
-
-const manifest = await integrityManager.generateManifest(criticalFiles);
-
-// Verificar integridad posteriormente
-const verification = await integrityManager.verifyManifest(criticalFiles, manifest);
-console.log('Integrity Check:', verification.overallValid ? 'PASSED' : 'FAILED');
 ```
 
-Estos patrones forman la base de un sistema de seguridad robusto en aplicaciones web modernas, combinando la teoría criptográfica con implementaciones prácticas y seguras.
+### Pattern 5: Rate Limiting Seguro
+
+#### **Protección contra Ataques de Fuerza Bruta**
+
+**Concepto:** Limitar requests por IP usando hashing para privacidad y ventanas deslizantes para precisión.
+
+```javascript
+const crypto = require('crypto');
+
+class SecureRateLimiter {
+    constructor(options = {}) {
+        this.windowMs = options.windowMs || 15 * 60 * 1000; // 15 minutos
+        this.maxRequests = options.maxRequests || 100;
+        this.storage = new Map(); // En producción usar Redis
+        this.hashSecret = process.env.RATE_LIMIT_SECRET || crypto.randomBytes(32).toString('hex');
+    }
+    
+    hashKey(ip, context = '') {
+        return crypto.createHmac('sha256', this.hashSecret)
+            .update(ip + context)
+            .digest('hex');
+    }
+    
+    checkLimit(ip, context = 'default') {
+        const key = this.hashKey(ip, context);
+        const now = Date.now();
+        const windowStart = now - this.windowMs;
+        
+        let record = this.storage.get(key) || { requests: [] };
+        
+        // Filtrar requests dentro de ventana actual
+        record.requests = record.requests.filter(timestamp => timestamp > windowStart);
+        
+        if (record.requests.length >= this.maxRequests) {
+            const resetTime = Math.min(...record.requests) + this.windowMs;
+            return {
+                allowed: false,
+                remaining: 0,
+                resetTime: new Date(resetTime),
+                retryAfter: Math.ceil((resetTime - now) / 1000)
+            };
+        }
+        
+        record.requests.push(now);
+        this.storage.set(key, record);
+        
+        return {
+            allowed: true,
+            remaining: this.maxRequests - record.requests.length,
+            resetTime: new Date(now + this.windowMs)
+        };
+    }
+    
+    middleware(options = {}) {
+        return (req, res, next) => {
+            const result = this.checkLimit(req.ip, options.context);
+            
+            res.set({
+                'X-RateLimit-Limit': this.maxRequests,
+                'X-RateLimit-Remaining': result.remaining,
+                'X-RateLimit-Reset': result.resetTime.toISOString()
+            });
+            
+            if (!result.allowed) {
+                return res.status(429).json({
+                    error: 'Too Many Requests',
+                    retryAfter: result.retryAfter
+                });
+            }
+            
+            next();
+        };
+    }
+}
+```
+
+Estos patrones forman la base para implementar seguridad criptográfica en aplicaciones web modernas, basados en estándares de la industria y mejores prácticas actualizadas.
+
+---
 
 ## 10. Buenas Prácticas y Resumen
 
@@ -1652,3 +1465,12 @@ Estos patrones forman la base de un sistema de seguridad robusto en aplicaciones
   - **Datos en tránsito/reposo**: `AES-256-GCM`.
   - **Firmas digitales**: `Ed25519` (o `RSA-3072` si es necesario).
 - **Mantente actualizado**. El campo de la criptografía evoluciona. Algoritmos que son seguros hoy pueden ser débiles mañana. Sigue las recomendaciones de organizaciones como NIST y OWASP.
+
+### **Lista de Verificación de Seguridad Criptográfica**
+
+- [ ] TLS 1.3 implementado correctamente
+- [ ] Contraseñas hasheadas con Argon2id + salt + pepper
+- [ ] JWT con tokens de corta duración y rotación
+- [ ] Datos sensibles cifrados con AES-256-GCM
+- [ ] Rate limiting implementado para APIs críticas
+- [ ] Rotación regular de claves y secretos
