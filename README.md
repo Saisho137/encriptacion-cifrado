@@ -8,12 +8,14 @@ Esta es una guía de estudio completa sobre los conceptos de seguridad web, con 
 
 1. [Conceptos Fundamentales](#1-fundamentos-criptografía-encriptación-o-cifrado)
 2. [Historia y Tipos de Ataques Criptográficos](#2-historia-y-tipos-de-ataques-criptográficos)
-3. [Cifrado Simétrico](https://www.google.com/search?q=%233-cifrado-sim%C3%A9trico-la-llave-%C3%BAnica)
+3. [Cifrado Simétrico](#3-cifrado-simétrico-)
 4. [Cifrado Asimétrico](#4-cifrado-asimétrico--)
 5. [Funciones Hash](#5-funciones-hash-la-huella-digital-de-los-datos)
-6. [Análisis Comparativo de Algoritmos Modernos](https://www.google.com/search?q=%236-an%C3%A1lisis-comparativo-de-algoritmos-modernos)
-7. [Patrones de Seguridad en Aplicaciones Web](https://www.google.com/search?q=%237-patrones-de-seguridad-en-aplicaciones-web)
-8. [Buenas Prácticas y Resumen](https://www.google.com/search?q=%238-buenas-pr%C3%A1cticas-y-resumen)
+6. [Casos de Uso en la Web](#6-casos-de-uso-en-la-web)
+7. [Análisis Comparativo de Rendimiento](#7-análisis-comparativo-de-rendimiento)
+8. [Cifrado en Reposo vs Cifrado en tránsito](#8-cifrado-en-reposo-vs-cifrado-en-tránsito)
+9. [Patrones de Seguridad Web Aplicados](#9-patrones-de-seguridad-web-aplicados)
+10. [Buenas Prácticas y Resumen](#10-buenas-prácticas-y-resumen)
 
 ---
 
@@ -814,44 +816,273 @@ Este enfoque híbrido nos da la **seguridad** del intercambio asimétrico y la *
 
 ### Algoritmos Simétricos
 
-#### **AES vs ChaCha20: La Batalla por la Velocidad**
+#### **AES vs ChaCha20: Rendimiento Detallado por Hardware**
+
+**Datos de rendimiento** basados en implementaciones OpenSSL 3.0+, RFC 7539 y benchmarks de Cloudflare:
 
 ```plaintext
-Hardware/Contexto     | AES-256-GCM | ChaCha20-Poly1305
-==================================================
-Intel con AES-NI      | 8-15 GB/s   | 1-2 GB/s
-ARM con Crypto Ext    | 2-5 GB/s    | 800 MB/s
-Software puro (x64)   | 100-500 MB/s| 400-800 MB/s
-Móviles (ARM32)       | 50-100 MB/s | 200-400 MB/s
-JavaScript/Browser    | 50 MB/s     | 150 MB/s
-Microcontroladores    | 1-10 MB/s   | 5-20 MB/s
+Hardware/Contexto               | AES-256-GCM     | ChaCha20-Poly1305 | Factor Ventaja
+================================================================================
+Intel con AES-NI (servidor)     | 8-15 GB/s      | 1.5-2.5 GB/s     | AES 5-6x más rápido
+ARM64 con Crypto Extensions      | 2.5-5 GB/s     | 1.2-2 GB/s       | AES 2-3x más rápido
+Software puro x86-64            | 150-300 MB/s   | 500-800 MB/s     | ChaCha20 2-3x más rápido
+ARM32 (móviles sin crypto ext)   | 25-75 MB/s     | 75-200 MB/s      | ChaCha20 3-4x más rápido
+JavaScript (V8/SpiderMonkey)     | 15-50 MB/s     | 100-200 MB/s     | ChaCha20 4-6x más rápido
+Microcontroladores (32-bit)     | 1-8 MB/s       | 8-25 MB/s        | ChaCha20 5-8x más rápido
 ```
 
-#### **¿Cuándo usar cada uno?**
+#### **Análisis Técnico de Rendimiento**
 
-**AES-256-GCM - Ideal para:**
+**¿Por qué AES es más rápido con aceleración hardware?**
 
-- Servidores con hardware Intel/AMD moderno
-- Aplicaciones que requieren máxima velocidad
-- Sistemas con aceleración hardware AES-NI
-- Compatibilidad máxima (estándar universal)
+- **AES-NI (Intel/AMD)**: Instrucciones dedicadas (`AESENC`, `AESENCLAST`) ejecutan una ronda completa en 1-2 ciclos
+- **ARM Crypto Extensions**: Instrucciones `AESE`/`AESMC` proporcionan aceleración similar
+- **Sin aceleración**: AES requiere operaciones costosas en tablas de sustitución (S-boxes) vulnerables a ataques de cache
 
-**ChaCha20-Poly1305 - Ideal para:**
+**¿Por qué ChaCha20 domina en software puro?**
 
-- Dispositivos móviles e IoT
-- Sistemas sin aceleración hardware
-- JavaScript y aplicaciones web
-- Resistencia a ataques de timing
+- **Operaciones ARX**: Solo usa sumas, rotaciones y XOR (primitivas muy eficientes en CPU)
+- **Sin tablas**: Elimina accesos costosos a memoria y ataques de timing
+- **Paralelización**: Fácil optimización con SIMD (SSE/AVX en x86, NEON en ARM)
+
+#### **Consideraciones de Seguridad**
+
+**AES-256-GCM**:
+
+- **Fortaleza**: 256 bits de seguridad simétrica
+- **Vulnerabilidades**: Ataques de timing en implementaciones software
+
+**ChaCha20-Poly1305**:
+
+- **Fortaleza**: 256 bits de seguridad simétrica
+- **Ventajas**: Resistente a ataques de timing por diseño
+- **Autenticación**: Poly1305 proporciona ~100 bits de seguridad de autenticación
+
+#### **¿Cuándo usar cada algoritmo?**
+
+**AES-256-GCM - Óptimo para:**
+
+- **Servidores Intel/AMD modernos** (post-2010 con AES-NI)
+- **ARM64 con extensiones crypto** (iPhone 5s+, servidores ARM modernas)
+- **Máximo throughput** cuando hay aceleración hardware
+- **Compatibilidad universal** (soportado en todo hardware/software)
+- **Cumplimiento normativo** (certificado FIPS 140-2, aprobado por NSA)
+
+**ChaCha20-Poly1305 - Óptimo para:**
+
+- **Dispositivos móviles antiguos** (ARM32 sin crypto extensions)
+- **Microcontroladores e IoT** (ESP32, Arduino, etc.)
+- **Navegadores web** (JavaScript, WebAssembly)
+- **Sistemas embebidos** sin aceleración criptográfica
+- **Implementaciones críticas** donde se requiere resistencia a timing attacks
+- **Software que prioriza simplicidad** de implementación segura
 
 ### Algoritmos Asimétricos
 
-#### **RSA vs Eval: La Batalla por la Velocidad**
+#### **RSA vs ECC: La Batalla por la Eficiencia**
 
-<!-- TODO: Hacer esta comparación. -->
+```plaintext
+Operación/Algoritmo        | RSA-2048    | RSA-3072    | ECDSA P-256 | Ed25519
+========================================================================
+Generación de Claves       | 20-100 ms   | 200-500 ms  | 1-5 ms      | 0.5-2 ms
+Firma Digital              | 1-10 ms     | 5-20 ms     | 0.2-1 ms    | 0.1-0.5 ms
+Verificación de Firma      | 0.1-0.5 ms  | 0.2-1 ms    | 0.5-2 ms    | 0.2-1 ms
+Intercambio de Claves      | N/A         | N/A         | 0.5-2 ms    | 0.3-1 ms
+Tamaño Clave Pública       | 256 bytes   | 384 bytes   | 64 bytes    | 32 bytes
+Tamaño Clave Privada       | 1024 bytes  | 1536 bytes  | 32 bytes    | 32 bytes
+Tamaño de Firma            | 256 bytes   | 384 bytes   | 64 bytes    | 64 bytes
+```
+
+#### **Niveles de Seguridad Equivalentes**
+
+```plaintext
+Bits de Seguridad | RSA        | ECC        | Factor de Mejora
+=====================================================
+80 bits           | 1024 bits  | 160 bits   | 6.4x más pequeño
+112 bits          | 2048 bits  | 224 bits   | 9.1x más pequeño
+128 bits          | 3072 bits  | 256 bits   | 12x más pequeño
+192 bits          | 7680 bits  | 384 bits   | 20x más pequeño
+256 bits          | 15360 bits | 512 bits   | 30x más pequeño
+```
+
+#### **¿Cuándo usar RSA vs ECC?**
+
+**RSA - Ideal para:**
+
+- Sistemas legacy que requieren compatibilidad máxima
+- Cuando se necesita cifrado directo de datos pequeños
+- Entornos donde ECC no está disponible
+- Aplicaciones con restricciones de patentes (aunque la mayoría han expirado)
+
+**ECC (ECDSA/Ed25519) - Ideal para:**
+
+- Nuevos sistemas que priorizan rendimiento
+- Dispositivos con recursos limitados (IoT, móviles)
+- Aplicaciones que requieren alta velocidad de firma
+- Protocolos modernos (TLS 1.3, SSH, Bitcoin)
+- Sistemas con restricciones de ancho de banda
 
 ---
 
-## 8. Patrones de Seguridad Web Aplicados
+## 8. Cifrado en Reposo vs Cifrado en tránsito
+
+En el ecosistema de seguridad digital, los datos necesitan protección en **dos estados fundamentales**: cuando están siendo **transmitidos** (en tránsito) y cuando están **almacenados** (en reposo). Cada escenario presenta desafíos únicos y requiere estrategias criptográficas específicas.
+
+### Conceptos Fundamentales
+
+#### **Cifrado en Tránsito (Data in Transit)**
+
+Es la protección de datos mientras **se mueven** a través de redes, desde un punto de origen hasta un destino.
+
+```plaintext
+Cliente → [Internet/Red] → Servidor
+   ↓            ↓            ↓
+Datos       Interceptación   Datos
+Planos      Posible (MITM)   Planos
+```
+
+**Escenarios típicos:**
+
+- Navegación web (HTTPS)
+- Transferencia de archivos (SFTP, SCP)
+- Comunicación entre servicios (APIs, microservicios)
+- Emails y mensajería instantánea
+- Streaming de video/audio
+
+#### **Cifrado en Reposo (Data at Rest)**
+
+Es la protección de datos mientras están **almacenados** en sistemas de persistencia.
+
+```plaintext
+Aplicación → [Almacenamiento] → Recuperación
+     ↓              ↓               ↓
+  Datos          Acceso No        Datos
+  Planos        Autorizado        Planos
+```
+
+**Escenarios típicos:**
+
+- Bases de datos
+- Archivos en discos duros/SSD
+- Respaldos (backups)
+- Almacenamiento en la nube
+- Dispositivos móviles y laptops
+
+### Comparación Técnica Detallada
+
+#### **Diferencias Arquitecturales**
+
+| Aspecto | Cifrado en Tránsito | Cifrado en Reposo |
+|---------|-------------------|-------------------|
+| **Duración** | Temporal (segundos/minutos) | Permanente (días/años) |
+| **Alcance** | Punto a punto | Local/Centralizado |
+| **Amenazas** | Intercepción, MITM | Robo físico, acceso no autorizado |
+| **Rendimiento** | Crítico (latencia) | Menos crítico (throughput) |
+| **Gestión de Claves** | Ephemeral keys (PFS) | Claves persistentes |
+| **Algoritmos** | Híbridos (RSA+AES) | Principalmente simétricos |
+
+#### **Vectores de Ataque Específicos**
+
+**En Tránsito:**
+
+- **Man-in-the-Middle (MITM)**: Interceptación activa
+- **Packet Sniffing**: Captura pasiva de tráfico
+- **DNS Spoofing**: Redirección maliciosa
+- **Certificate Pinning Bypass**: Ataques a la validación de certificados
+- **Downgrade Attacks**: Forzar protocolos menos seguros
+
+**En Reposo:**
+
+- **Physical Theft**: Robo de dispositivos/servidores
+- **Insider Threats**: Acceso malicioso interno
+- **Database Breaches**: Comprometimiento de SGBD
+- **Backup Exposure**: Respaldos no cifrados
+- **Cloud Misconfiguration**: Configuración incorrecta de permisos
+
+### Mejores Prácticas por Escenario
+
+#### **Para Cifrado en Tránsito:**
+
+1. **Usar TLS 1.3** como mínimo, deshabilitando versiones anteriores
+2. **Implementar HSTS** con preload para forzar HTTPS
+3. **Certificate Pinning** en aplicaciones móviles críticas
+4. **Perfect Forward Secrecy** con intercambio X25519
+5. **Validación estricta de certificados** sin excepciones
+6. **Monitoreo de conexiones** para detectar downgrade attacks
+
+#### **Para Cifrado en Reposo:**
+
+1. **Cifrado a múltiples niveles**: filesystem + database + application
+2. **Rotación automática de claves** cada 90 días máximo
+3. **Separación de claves**: datos y claves en sistemas diferentes
+4. **Hardware Security Modules (HSM)** para claves críticas
+5. **Cifrado de backups** con claves independientes
+6. **Auditoría de acceso** a datos cifrados
+
+### Consideraciones de Rendimiento
+
+#### **Impacto en Tránsito:**
+
+```javascript
+// Benchmark de overhead criptográfico
+const benchmark = {
+    plainHTTP: {
+        latency: '50ms',
+        throughput: '1 GB/s',
+        cpu: '5%'
+    },
+    httpsAES: {
+        latency: '52ms',    // +4% overhead
+        throughput: '950 MB/s', // -5% overhead  
+        cpu: '8%'           // +60% overhead
+    },
+    httpsChaCha20: {
+        latency: '53ms',    // +6% overhead
+        throughput: '900 MB/s', // -10% overhead
+        cpu: '12%'          // +140% overhead (sin AES-NI)
+    }
+};
+```
+
+#### **Impacto en Reposo:**
+
+```javascript
+const storageImpact = {
+    plaintext: {
+        size: '1 GB',
+        readTime: '100ms',
+        writeTime: '150ms'
+    },
+    encrypted: {
+        size: '1.02 GB',    // +2% overhead (metadata)
+        readTime: '105ms',  // +5% overhead
+        writeTime: '160ms'  // +7% overhead
+    }
+};
+```
+
+**Optimizaciones recomendadas:**
+
+- **Cachear sesiones TLS** para reducir handshakes
+- **Usar hardware acceleration** (AES-NI) cuando esté disponible
+- **Cifrado asíncrono** para no bloquear I/O
+- **Compression antes del cifrado** para reducir tamaño
+- **Cifrado selectivo** solo de datos verdaderamente sensibles
+
+### Cumplimiento Normativo
+
+#### **Requerimientos por Industria:**
+
+| Industria | Estándar | Tránsito | Reposo | Algoritmos Requeridos |
+|-----------|----------|----------|--------|--------------------|
+| **Financiera** | PCI DSS | TLS 1.2+ | AES-256 | RSA-2048+, AES-256-GCM |
+| **Salud** | HIPAA | TLS 1.2+ | AES-256 | FIPS 140-2 Level 3+ |
+| **Gobierno** | FIPS 140-2 | Suite B | Suite B | NSA Suite B |
+| **Europa** | GDPR | "Estado del arte" | "Estado del arte" | Recomendaciones ENISA |
+
+---
+
+## 9. Patrones de Seguridad Web Aplicados
 
 Ahora unamos todo el conocimiento teórico con la implementación práctica. ¿Cómo se manifiestan estos conceptos en el día a día de un desarrollador Full Stack?
 
@@ -861,7 +1092,7 @@ Ahora unamos todo el conocimiento teórico con la implementación práctica. ¿C
 
 #### **El Protocolo TLS 1.3: Handshake Optimizado**
 
-```
+```plaintext
 Cliente                              Servidor
   |--- ClientHello ------------------>|
   |    (cipher suites, key shares)    |
@@ -1412,7 +1643,7 @@ console.log('Integrity Check:', verification.overallValid ? 'PASSED' : 'FAILED')
 
 Estos patrones forman la base de un sistema de seguridad robusto en aplicaciones web modernas, combinando la teoría criptográfica con implementaciones prácticas y seguras.
 
-## 9. Buenas Prácticas y Resumen
+## 10. Buenas Prácticas y Resumen
 
 - **Nunca implementes tu propia criptografía**. Usa librerías estándar, auditadas y bien mantenidas (`libsodium`, `OpenSSL`, y las APIs nativas de tu lenguaje como `crypto` en Node.js).
 - **Mantén las claves seguras**. Las claves son el eslabón más débil. Usa gestores de secretos (Vault, KMS) y nunca las hardcodees en tu código.
