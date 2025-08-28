@@ -33,31 +33,183 @@ Para empezar, aclaremos los términos. Aunque a menudo se usan indistintamente, 
 > **No hay diferencia práctica** entre "encriptación" y "cifrado" en el contexto de seguridad informática. Ambos términos se usan intercambiablemente.
 > **Analogía 🧠:** Piensa en la **Criptografía** como la *ingeniería de cerraduras y cajas fuertes*. La **Encriptación** sería el *acto de girar la llave para cerrar la caja fuerte*.
 
-### Elementos Básicos del Proceso Criptográfico
+### Glosario de Términos Criptográficos
 
-#### 1. **Texto Plano (Plaintext)**
+#### Fundamentos Básicos
 
-- Información original legible
+##### Algoritmo de Cifrado
+
+- Función matemática que realiza la transformación de datos
+- Ejemplos: AES, RSA, ChaCha20, Ed25519
+- Debe ser público y ampliamente auditado
+
+##### Clave (Key)
+
+- Parámetro secreto usado por el algoritmo criptográfico
+- Su longitud determina la fortaleza del cifrado
+- Tipos: simétricas (una sola), asimétricas (par público/privado)
+
+##### Texto Plano (Plaintext)
+
+- Información original en formato legible
+- Entrada del proceso de cifrado
 - Ejemplo: "Información confidencial"
 
-#### 2. **Texto Cifrado (Ciphertext)**  
+##### Texto Cifrado (Ciphertext)
 
-- Información transformada e ilegible
+- Información transformada e ilegible después del cifrado
+- Salida del proceso de cifrado
 - Ejemplo: `496e666f726d6163696f6e20636f6e666964656e6369616c` (hexadecimal)
 
-#### 3. **Algoritmo de Cifrado**
+#### Procesos Criptográficos
 
-- Función matemática que realiza la transformación
-- Ejemplos: AES, RSA, ChaCha20
+##### Cifrado/Encriptación (Encryption)
 
-#### 4. **Clave (Key)**
+- Proceso de convertir texto plano a texto cifrado
+- Requiere algoritmo + clave
+- Garantiza confidencialidad
 
-- Parámetro secreto usado por el algoritmo
-- Su longitud determina la fortaleza del cifrado
-
-#### 5. **Descifrado (Decryption)**
+##### Descifrado/Desencriptación (Decryption)
 
 - Proceso inverso que convierte texto cifrado a texto plano
+- Requiere la clave correcta
+- Solo posible con autorización
+
+##### Hashing
+
+- Proceso unidireccional que produce un resumen de tamaño fijo
+- No es reversible (no se puede "deshashear")
+- Garantiza integridad
+
+##### Firma Digital (Digital Signature)
+
+- Proceso que autentica el origen y garantiza integridad
+- Usa clave privada para firmar, pública para verificar
+- Proporciona no repudio
+
+#### Componentes de Seguridad
+
+##### Salt
+
+- Valor aleatorio único añadido antes del hash
+- Previene ataques de rainbow tables
+- Debe ser único por cada entrada
+
+##### Pepper
+
+- Secreto global de la aplicación añadido al hash
+- Protección adicional incluso si la base de datos es comprometida
+- Se almacena separado de los datos
+
+##### Vector de Inicialización (IV)
+
+- Valor aleatorio usado en cifrado simétrico
+- Debe ser único para cada operación de cifrado
+- No necesita ser secreto, pero sí aleatorio
+
+##### Nonce (Number Used Once)
+
+- Valor que solo se usa una vez en operaciones criptográficas
+- Crítico en modos como GCM
+- Su reutilización puede comprometer la seguridad
+
+#### Tipos de Criptografía
+
+##### Criptografía Simétrica
+
+- Usa la misma clave para cifrar y descifrar
+- Rápida y eficiente para grandes volúmenes
+- Problema: distribución segura de claves
+
+##### Criptografía Asimétrica
+
+- Usa un par de claves (pública/privada)
+- Resuelve el problema de distribución de claves
+- Más lenta que la simétrica
+
+##### Criptografía Híbrida
+
+- Combina simétrica y asimétrica
+- Usa asimétrica para intercambiar claves simétricas
+- Aprovecha ventajas de ambos sistemas
+
+#### Protocolos y Tecnologías
+
+##### AEAD (Authenticated Encryption with Associated Data)
+
+- Proporciona confidencialidad, autenticidad e integridad
+- Ejemplo: AES-GCM, ChaCha20-Poly1305
+- Estándar recomendado para nuevas implementaciones
+
+##### PFS (Perfect Forward Secrecy)
+
+- Garantiza que comprometer claves futuras no afecte sesiones pasadas
+- Usa claves efímeras para cada sesión
+- Implementado en TLS 1.3
+
+##### TLS (Transport Layer Security)
+
+- Protocolo para comunicación segura en redes
+- Evolución de SSL
+- Versión actual recomendada: TLS 1.3
+
+##### PKI (Public Key Infrastructure)
+
+- Infraestructura para gestión de claves públicas
+- Incluye certificados digitales y autoridades de certificación
+- Base de la confianza en internet
+
+##### HSM (Hardware Security Module)
+
+- Dispositivo físico que protege y gestiona claves
+- Proporciona mayor seguridad que software
+- Usado en aplicaciones críticas
+
+#### Ataques y Vulnerabilidades
+
+##### Ataque de Fuerza Bruta
+
+- Intento sistemático de todas las combinaciones posibles
+- Mitigación: claves largas y algoritmos lentos
+
+##### Rainbow Tables
+
+- Tablas precomputadas de hashes comunes
+- Mitigación: uso de salt único
+
+##### MITM (Man-in-the-Middle)
+
+- Interceptación de comunicaciones
+- Mitigación: verificación de certificados y pinning
+
+##### Side-Channel Attacks
+
+- Explotan información filtrada (tiempo, energía, emisiones)
+- Mitigación: implementaciones resistentes a timing
+
+#### Algoritmos Recomendados
+
+##### Cifrado Simétrico Moderno
+
+- **AES-256-GCM**: Estándar universal
+- **ChaCha20-Poly1305**: Software sin aceleración hardware
+
+##### Cifrado Asimétrico Moderno
+
+- **RSA-3072+**: Compatibilidad con sistemas legacy
+- **Ed25519**: Firmas digitales modernas
+- **X25519**: Intercambio de claves ECDH
+
+##### Funciones Hash Seguras
+
+- **SHA-256, SHA-3**: Integridad general
+- **Argon2id**: Almacenamiento de contraseñas
+
+##### Algoritmos Obsoletos (No Usar)
+
+- **DES, 3DES**: Reemplazar por AES
+- **SHA-1**: Reemplazar por SHA-256+
+- **RSA-1024**: Vulnerable, usar RSA-3072+
 
 ### Principios de Seguridad (CIA Triad)
 
