@@ -1,6 +1,6 @@
 # 🛡️ Guía de Seguridad Web: Criptografía Aplicada
 
-Esta es una guía de estudio completa sobre los conceptos de seguridad web, con un enfoque profundo en criptografía (encriptación y hashing), diseñada para preparar Assessments de nivel Mid-Senior para roles Full Stack y para servir como referencia técnica integral.
+Esta es una documentación completa sobre cifrado y encriptación, diseñada para estudiar y aprender los conceptos fundamentales de criptografía moderna. La guía cubre desde los principios básicos hasta implementaciones prácticas en aplicaciones web, sirviendo como referencia técnica integral para desarrolladores que buscan comprender y aplicar técnicas criptográficas de manera segura y eficiente.
 
 ---
 
