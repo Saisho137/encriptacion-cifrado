@@ -4,26 +4,25 @@ Esta es una guía de estudio completa sobre los conceptos de seguridad web, con 
 
 ---
 
-## 📑 Tabla de Contenidos
+## Tabla de Contenidos
 
-1. [Conceptos Fundamentales](#1-fundamentos-criptografía-encriptación-o-cifrado)
-2. [Historia y Tipos de Ataques Criptográficos](#2-historia-y-tipos-de-ataques-criptográficos)
-3. [Cifrado Simétrico](#3-cifrado-simétrico-)
-4. [Cifrado Asimétrico](#4-cifrado-asimétrico--)
-5. [Funciones Hash](#5-funciones-hash-la-huella-digital-de-los-datos)
-6. [Casos de Uso en la Web](#6-casos-de-uso-en-la-web)
-7. [Análisis Comparativo de Rendimiento](#7-análisis-comparativo-de-rendimiento)
-8. [Cifrado en Reposo vs Cifrado en tránsito](#8-cifrado-en-reposo-vs-cifrado-en-tránsito)
-9. [Patrones de Seguridad Web Aplicados](#9-patrones-de-seguridad-web-aplicados)
-10. [Buenas Prácticas y Resumen](#10-buenas-prácticas-y-resumen)
+1. [Fundamentos de Criptografía](#1-fundamentos-de-criptografía)
+2. [Historia y Ataques Criptográficos](#2-historia-y-ataques-criptográficos)
+3. [Cifrado Simétrico](#3-cifrado-simétrico)
+4. [Cifrado Asimétrico](#4-cifrado-asimétrico)
+5. [Funciones Hash y Autenticación](#5-funciones-hash-y-autenticación)
+6. [Análisis Comparativo de Rendimiento](#6-análisis-comparativo-de-rendimiento)
+7. [Cifrado en Reposo vs Cifrado en Tránsito](#7-cifrado-en-reposo-vs-cifrado-en-tránsito)
+8. [Patrones de Seguridad Web Aplicados](#8-patrones-de-seguridad-web-aplicados)
+9. [Buenas Prácticas y Conclusiones](#9-buenas-prácticas-y-conclusiones)
 
 ---
 
-## 1. Fundamentos: ¿Criptografía, Encriptación o Cifrado?
+## 1. Fundamentos de Criptografía
 
 Para empezar, aclaremos los términos. Aunque a menudo se usan indistintamente, tienen matices específicos:
 
-### Definiciones Precisas
+### Terminología y Conceptos Básicos
 
 - **Criptografía**: Es la **disciplina** o el campo de estudio de las técnicas de comunicación segura en presencia de terceros (adversarios). Abarca mucho más que solo "esconder" mensajes; incluye técnicas para la autenticación, integridad de datos y no repudio. Es el paraguas que lo cubre todo.
 
@@ -79,7 +78,7 @@ Para empezar, aclaremos los términos. Aunque a menudo se usan indistintamente, 
 
 ---
 
-## 2. Historia y Tipos de Ataques Criptográficos
+## 2. Historia y Ataques Criptográficos
 
 ### Evolución de la Criptografía
 
@@ -128,11 +127,11 @@ Las computadoras cuánticas representan una amenaza existencial para la criptogr
 
 ---
 
-## 3. Cifrado Simétrico 🔑
+## 3. Cifrado Simétrico
 
 El cifrado simétrico es el método más antiguo e intuitivo. En el cifrado simétrico, **se utiliza la misma clave tanto para encriptar como para desencriptar** la información.
 
-### ¿Cómo funciona?
+### Funcionamiento
 
 ```plaintext
 Texto Plano + Clave → [Algoritmo] → Texto Cifrado
@@ -144,16 +143,16 @@ Texto Cifrado + Clave → [Algoritmo] → Texto Plano
 3. **Transmisión**: El texto cifrado se envía al receptor.
 4. **Descifrado**: El receptor usa el mismo algoritmo y la misma clave secreta para revertir el proceso y obtener el texto plano original.
 
-### Características Fundamentales
+### Características del Cifrado Simétrico
 
-#### **✅ Ventajas**
+#### **✅ Ventajas del Cifrado Simétrico**
 
 - **Velocidad**: Extremadamente rápido y eficiente (1-15 GB/s en hardware moderno)
 - **Eficiencia**: Bajo uso de CPU y memoria
 - **Simplicidad**: Implementación más directa
 - **Ideal para grandes volúmenes**: Streams de video, bases de datos completas, archivos grandes
 
-#### **❌ Desventajas**
+#### **❌ Desventajas del Cifrado Simétrico**
 
 - **Distribución de la Clave**: El gran problema es: ¿cómo compartes la clave secreta de forma segura con el receptor?
 - **Escalabilidad**: n usuarios requieren n(n-1)/2 claves únicas
@@ -303,11 +302,11 @@ Counter+Nonce → AES → Keystream ⊕ Plaintext → Ciphertext + AuthTag
 
 ---
 
-## 4. Cifrado Asimétrico 🔑-🔐
+## 4. Cifrado Asimétrico
 
 El cifrado asimétrico, también conocido como **criptografía de clave pública**, fue el gran avance que resolvió el problema de la distribución de claves del cifrado simétrico.
 
-### Concepto Fundamental
+### Concepto de Claves Públicas y Privadas
 
 En este sistema revolucionario, **se utiliza un par de claves matemáticamente relacionadas**:
 
@@ -319,7 +318,7 @@ Texto Cifrado + Clave Privada → [Algoritmo] → Texto Plano
 - **Clave Pública**: Se puede compartir con cualquiera. Se usa para **encriptar** datos.
 - **Clave Privada**: Debe mantenerse en secreto absoluto. Es la única que puede **desencriptar** los datos cifrados con su clave pública correspondiente.
 
-### ¿Cómo funciona?
+### Proceso de Cifrado Asimétrico
 
 1. **Generación de Par de Claves**: El receptor (Bob) genera su propio par de claves (pública y privada).
 2. **Distribución de Clave Pública**: Bob comparte su clave pública con el emisor (Alice) y con el mundo entero si quiere.
@@ -327,16 +326,16 @@ Texto Cifrado + Clave Privada → [Algoritmo] → Texto Plano
 4. **Transmisión**: El texto cifrado se envía a Bob.
 5. **Descifrado**: Bob usa su clave privada para descifrar el mensaje. Nadie más puede hacerlo.
 
-### Características Fundamentales
+### Características del Cifrado Asimétrico
 
-#### **✅ Ventajas**
+#### **✅ Ventajas del Cifrado Asimétrico**
 
 - **Intercambio Seguro de Claves**: Resuelve el problema de la distribución
 - **Escalabilidad**: n usuarios solo necesitan n pares de claves
 - **Autenticación**: Permite verificar identidades
 - **No repudio**: Se puede probar quién envió un mensaje (firmas digitales)
 
-#### **❌ Desventajas**
+#### **❌ Desventajas del Cifrado Asimétrico**
 
 - **Lentitud**: 100-1000x más lento que el cifrado simétrico
 - **Tamaño**: Claves y texto cifrado mucho más grandes
@@ -485,11 +484,11 @@ def verify_signature(message, signature, e, n):
 
 ---
 
-## 5. Funciones Hash: La Huella Digital de los Datos
+## 5. Funciones Hash y Autenticación
 
 Una función hash criptográfica no es un algoritmo de encriptación, aunque a menudo se agrupan en discusiones de seguridad. A diferencia del cifrado, el hashing es un proceso **unidireccional** - no se puede "deshashear" un resultado para obtener la entrada original.
 
-### Concepto Fundamental
+### Concepto de Funciones Hash
 
 Un hash toma una entrada de cualquier tamaño y produce una salida de tamaño fijo, llamada "resumen", "digest" o "hash".
 
@@ -584,47 +583,6 @@ console.log(sha256("Hello Worlc")); // Un solo carácter diferente
 - **Estado**: Estándar desde 2015, pero menos adoptado que SHA-2
 - **Variantes**: SHA3-224, SHA3-256, SHA3-384, SHA3-512
 
-### Casos de Uso Principales
-
-#### **1. Almacenamiento Seguro de Contraseñas**
-
-**❌ NUNCA guardar contraseñas en texto plano, ni cifradas:** Se deben guardar *hasheadas*.
-
-**Hashing Simple (INCORRECTO):**
-
-```javascript
-// MAL - Vulnerable a rainbow tables
-const plainPassword = "miPassword123";
-const badHash = sha256(plainPassword);
-// Almacenar: "a1b2c3..."
-```
-
-**✅ Forma correcta:**
-
-```javascript
-const bcrypt = require('bcrypt');
-const argon2 = require('argon2');
-
-// Usando bcrypt
-const saltRounds = 12;
-const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-// Usando Argon2 (recomendado)
-async function hashPassword(password) {
-    // El salt se genera automáticamente
-    return await argon2.hash(password, {
-        type: argon2.argon2id, // La variante más resistente
-        memoryCost: 2 ** 16,  // 64MB de memoria
-        timeCost: 3,          // 3 iteraciones
-        parallelism: 1,       // Grado de paralelismo
-    });
-}
-
-async function verifyPassword(hash, password) {
-    return await argon2.verify(hash, password);
-}
-```
-
 **¿Por qué algoritmos especiales para contraseñas?**
 
 - **SHA-256 es demasiado rápido**: Un atacante puede probar billones de combinaciones por segundo
@@ -633,138 +591,6 @@ async function verifyPassword(hash, password) {
   - scrypt: Diseñado para ser intensivo en memoria.
   - Argon2: ✅ El estándar recomendado actualmente. Ganador de la Password Hashing Competition, es altamente resistente a ataques con hardware especializado (GPUs/ASICs).
 - **Resistencia a hardware**: Argon2 usa mucha memoria, dificultando ataques con GPU/ASIC
-
-#### **1.2. Mejorando el Hashing: Salt y Pepper**
-
-**Salt (Sal)**: Cadena aleatoria única por cada usuario
-
-```javascript
-function hashPasswordWithSalt(password) {
-    const salt = crypto.randomBytes(32); // 32 bytes aleatorios
-    const combined = password + salt.toString('hex');
-    const hash = sha256(combined);
-    
-    // Almacenar tanto el hash como el salt
-    return {
-        hash: hash,
-        salt: salt.toString('hex')
-    };
-}
-
-// Verificación
-function verifyPassword(password, storedHash, storedSalt) {
-    const combined = password + storedSalt;
-    const calculatedHash = sha256(combined);
-    return calculatedHash === storedHash;
-}
-```
-
-**Pepper (Pimienta)**: Secreto global de la aplicación
-
-```javascript
-const APP_PEPPER = process.env.CRYPTO_PEPPER; // Variable de entorno
-
-function hashPasswordWithSaltAndPepper(password, salt) {
-    const combined = password + salt + APP_PEPPER;
-    return sha256(combined);
-}
-```
-
-**Beneficios combinados**:
-
-- **Salt**: Previene ataques de rainbow tables y hace únicos hashes de contraseñas iguales
-- **Pepper**: Añade protección incluso si la base de datos es comprometida
-
-#### **2. Verificación de Integridad de Archivos (Checksums)**
-
-Un **checksum** es esencialmente una "huella digital" de un archivo:
-
-```bash
-# Generar checksum
-echo "Contenido del archivo" > archivo.txt
-sha256sum archivo.txt
-# Output: f1d2d2f924e986ac86fdf7b36c94bcdf32beec15 archivo.txt
-
-# Verificar integridad
-echo "f1d2d2f924e986ac86fdf7b36c94bcdf32beec15 archivo.txt" | sha256sum -c
-# Output: archivo.txt: OK
-```
-
-**Proceso de verificación**:
-
-1. El origen calcula y publica el hash del archivo
-2. Tú descargas el archivo
-3. Calculas el hash de tu copia local
-4. Comparas ambos hashes
-5. **Si coinciden**: Archivo íntegro ✅
-6. **Si difieren**: Archivo corrupto o manipulado ❌
-
-> **Analogía del Sello de Cera 📜:** Como un rey medieval que sella un pergamino con cera y su anillo. Si el sello está intacto, el mensaje no fue alterado.
-
-#### **3. HMAC (Hash-based Message Authentication Code)**
-
-HMAC proporciona **autenticación** e **integridad** usando una clave secreta:
-
-```javascript
-const crypto = require('crypto');
-
-function createHMAC(message, secretKey) {
-    return crypto.createHmac('sha256', secretKey)
-                 .update(message)
-                 .digest('hex');
-}
-
-// Crear HMAC
-const secret = "mi-clave-secreta";
-const message = "Mensaje importante";
-const hmac = createHMAC(message, secret);
-
-// Verificar HMAC
-function verifyHMAC(message, hmac, secretKey) {
-    const calculatedHMAC = createHMAC(message, secretKey);
-    return calculatedHMAC === hmac;
-}
-
-// El cliente envía: payload (mensaje) + signature (hmac)
-// El servidor verifica que el payload no fue modificado
-const isValid = verifyHMAC(secret, message, hmac);
-```
-
-**Usos de HMAC**:
-
-- **JWT signatures**: Verificar que un token no fue modificado
-- **API authentication**: Firmar peticiones para verificar origen
-- **Webhooks**: Verificar que un webhook proviene del servicio correcto
-
-#### **4. Proof of Work (Blockchain)**
-
-**Ejemplo:**
-
-```javascript
-function mineBlock(data, difficulty) {
-    let nonce = 0;
-    let hash;
-    const target = "0".repeat(difficulty); // Ej: "0000"
-    
-    console.log(`Minando bloque con dificultad ${difficulty}...`);
-    
-    do {
-        const blockData = data + nonce;
-        hash = sha256(blockData);
-        nonce++;
-        
-        if (nonce % 100000 === 0) {
-            console.log(`Intentos: ${nonce}, Hash: ${hash}`);
-        }
-    } while (!hash.startsWith(target));
-    
-    console.log(`¡Bloque minado! Nonce: ${nonce - 1}, Hash: ${hash}`);
-    return { hash, nonce: nonce - 1 };
-}
-
-// Ejemplo: encontrar hash que empiece con "0000"
-const result = mineBlock("Transaction: Alice -> Bob: 10 BTC", 4);
-```
 
 ### Comparación de Algoritmos Hash
 
@@ -780,39 +606,7 @@ const result = mineBlock("Transaction: Alice -> Bob: 10 BTC", 4);
 
 ---
 
-## 6. Casos de Uso en la Web
-
-La web moderna combina cifrado simétrico y asimétrico en un **esquema híbrido**. Así funciona **HTTPS (TLS/SSL)**:
-
-1. **Handshake TLS**: Navegador se conecta al servidor
-2. **Intercambio de Certificado**: Servidor envía su clave pública (en el certificado)
-3. **Generación de Clave de Sesión**: Navegador genera una clave simétrica aleatoria
-4. **Cifrado Asimétrico**: Navegador cifra la clave de sesión con la clave pública del servidor
-5. **Intercambio Seguro**: Clave de sesión cifrada se envía al servidor
-6. **Descifrado**: Servidor descifra la clave de sesión con su clave privada
-7. **Comunicación Simétrica**: Todo el tráfico posterior usa cifrado simétrico (rápido)
-
-```plaintext
-Cliente                              Servidor
-  |--- ClientHello ------------------>|
-  |<-- ServerHello + Certificate -----|
-  |--- ClientKeyExchange ------------>| (clave simétrica cifrada con RSA)
-  |<-- Finished ----------------------|
-  |--- Finished --------------------->|
-  |===== Datos con AES-256-GCM =======|
-```
-
-Este enfoque híbrido nos da la **seguridad** del intercambio asimétrico y la **velocidad** del cifrado simétrico.
-
-### **Resumen Comunicación de datos:**
-
-- Se genera clave simétrica temporal (AES-256)
-- Se intercambia usando RSA/ECC (lento, una sola vez)
-- Toda la comunicación posterior usa AES-256-GCM (rápido)
-
----
-
-## 7. Análisis Comparativo de Rendimiento
+## 6. Análisis Comparativo de Rendimiento
 
 ### Algoritmos Simétricos
 
@@ -924,7 +718,7 @@ Bits de Seguridad | RSA        | ECC        | Factor de Mejora
 
 ---
 
-## 8. Cifrado en Reposo vs Cifrado en tránsito
+## 7. Cifrado en Reposo vs Cifrado en Tránsito
 
 En el ecosistema de seguridad digital, los datos necesitan protección en **dos estados fundamentales**: cuando están siendo **transmitidos** (en tránsito) y cuando están **almacenados** (en reposo). Cada escenario presenta desafíos únicos y requiere estrategias criptográficas específicas.
 
@@ -1082,7 +876,7 @@ const storageImpact = {
 
 ---
 
-## 9. Patrones de Seguridad Web Aplicados
+## 8. Patrones de Seguridad Web Aplicados
 
 Esta sección transforma la teoría criptográfica en implementaciones prácticas para desarrolladores Full Stack. Cada patrón está basado en estándares de la industria y mejores prácticas verificadas.
 
@@ -1456,7 +1250,7 @@ Estos patrones forman la base para implementar seguridad criptográfica en aplic
 
 ---
 
-## 10. Buenas Prácticas y Resumen
+## 9. Buenas Prácticas y Conclusiones
 
 - **Nunca implementes tu propia criptografía**. Usa librerías estándar, auditadas y bien mantenidas (`libsodium`, `OpenSSL`, y las APIs nativas de tu lenguaje como `crypto` en Node.js).
 - **Mantén las claves seguras**. Las claves son el eslabón más débil. Usa gestores de secretos (Vault, KMS) y nunca las hardcodees en tu código.
