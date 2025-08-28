@@ -1043,6 +1043,79 @@ server {
 }
 ```
 
+#### **¿Por qué POST para Datos Sensibles si TLS Cifra Todo?**
+
+**Pregunta común:** Si TLS 1.3 cifra completamente la comunicación HTTP (incluyendo URLs y headers), ¿por qué es importante usar POST en lugar de GET para datos sensibles?
+
+**Respuesta:** TLS protege los datos **en tránsito**, pero no protege contra múltiples vectores de **persistencia y filtración**:
+
+##### **🚨 Problemas con GET + Datos Sensibles**
+
+- **Logs del Servidor Web**
+
+```bash
+# /var/log/nginx/access.log - ¡DATOS SENSIBLES EN TEXTO PLANO!
+192.168.1.100 - - [27/Aug/2025:10:30:45] "GET /api/transfer?amount=50000&account=123456789&pin=1234 HTTP/1.1" 200 1234
+```
+
+- **Historial del Navegador**
+
+```javascript
+// El navegador almacena esto permanentemente
+https://bank.com/profile?ssn=123456789&creditcard=4532123456789012
+```
+
+- **Referer Headers (Filtración a Sitios Externos)**
+
+```http
+GET /external-site HTTP/1.1
+Host: analytics.com
+Referer: https://bank.com/profile?ssn=123456789&pin=1234
+```
+
+- **Múltiples Puntos de Logging**
+
+```plaintext
+Cliente → [TLS Terminado] → Load Balancer → WAF → Proxy → Servidor
+                ↑              ↑         ↑      ↑
+            Ve URL plana   Registra    Logs   Logs
+```
+
+- **Cacheo No Deseado**
+
+```http
+# Proxies y CDNs pueden cachear requests GET
+GET /api/user-data?password=secret123&token=xyz789 HTTP/1.1
+Cache-Control: public  # ¡PELIGRO!
+```
+
+##### **✅ Solución: POST para Datos Sensibles**
+
+```javascript
+// ❌ MALO: Datos sensibles expuestos en logs
+fetch(`https://api.bank.com/transfer?amount=${amount}&pin=${pin}`)
+
+// ✅ BUENO: Datos sensibles protegidos en body
+fetch('https://api.bank.com/transfer', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ amount, pin, accountNumber })
+})
+```
+
+##### **📋 Resumen de Protecciones**
+
+| Aspecto | GET | POST |
+|---------|-----|------|
+| **Cifrado TLS** | ✅ Protegido | ✅ Protegido |
+| **Logs del servidor** | ❌ Expuesto | ✅ Protegido |
+| **Historial del navegador** | ❌ Expuesto | ✅ Protegido |
+| **Referer headers** | ❌ Filtración | ✅ Sin filtración |
+| **Cacheo accidental** | ❌ Posible | ✅ No cacheable |
+| **Múltiples proxies** | ❌ Expuesto | ✅ Protegido |
+
+> **🎯 Regla de Oro:** TLS cifra el transporte, pero POST protege contra persistencia no deseada y filtración lateral de datos sensibles.
+
 ### Pattern 2: Gestión Segura de Autenticación
 
 #### **Almacenamiento de Contraseñas con Argon2id**
